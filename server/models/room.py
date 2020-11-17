@@ -5,4 +5,4 @@ class Room:
         self.id = id
         self.name = name
 
-data_blueprint = Blueprint('room', __name__)
+room_blueprint = Blueprint('room', __name__)
