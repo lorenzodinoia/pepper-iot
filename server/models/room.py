@@ -16,28 +16,31 @@ room_blueprint = Blueprint('room', __name__)
 @room_blueprint.route("/add", methods=["POST"]) #Add a new room
 def add():
     if(request.json is not None):
-        try:
-            mydb = mysql.connector.connect(
-                user=constants.USER_DB,
-                database=constants.DATABASE,
-                password=constants.PASSWORD
-            )
-            cursor = mydb.cursor()
+        if("name" in request.json):
+            try:
+                mydb = mysql.connector.connect(
+                    user=constants.USER_DB,
+                    database=constants.DATABASE,
+                    password=constants.PASSWORD
+                )
+                cursor = mydb.cursor()
 
-            data = request.json
-            val = (data["name"])
-            sql = ("""INSERT INTO room (name_room) VALUES ("%s")""" % val)
-            cursor.execute(sql)
-            mydb.commit()
+                data = request.json
+                val = (data["name"])
+                sql = ("""INSERT INTO room (name_room) VALUES ("%s")""" % val)
+                cursor.execute(sql)
+                mydb.commit()
 
-            return jsonify({"message": "OK"})
-        except IntegrityError:
-            return jsonify({"message" : "Integrity violation"})
-        except Exception:
-            return abort(500)
-        finally:
-            if(mydb.is_connected()):
-                mydb.close()
+                return jsonify({"message": "ok"})
+            except IntegrityError:
+                return jsonify({"message" : "Integrity violation"})
+            except Exception:
+                return abort(500)
+            finally:
+                if(mydb.is_connected()):
+                    mydb.close()
+        else:
+            return abort(400)
     else:
         return abort(400)
 
