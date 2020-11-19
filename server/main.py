@@ -30,7 +30,6 @@ except ProgrammingError:
     cursor.execute("USE pepperiot")
     cursor.execute("CREATE TABLE room (id int auto_increment primary key, name_room varchar(50) NOT NULL UNIQUE)")
     cursor.execute("CREATE TABLE data_iot (id int auto_increment primary key, tmspt datetime NOT NULL, lux int, vox int, degree int, humidity int, room_id int, constraint fk_room foreign key (room_id) references room(id))")
-
     mydb.close()
 
 

@@ -20,6 +20,13 @@ data_blueprint = Blueprint('data', __name__)
 @data_blueprint.route("/add", methods=["POST"]) #Add a new record
 def add():
     data = request.json
+    value = add_data(data)
+    if(value == 200):
+        return jsonify({"message" : "ok"})
+    else:
+        return abort(value)
+
+def add_data(data):
     if(data is not None):
         lux = 0
         vox = 0
@@ -32,12 +39,12 @@ def add():
             vox = data["vox"]
         if("degree" in data):
             degree = data["degree"]
-        if("humidity"in data):
+        if("humidity" in data):
             humidity = data["humidity"]
         if("room_id" in data):
             room_id = data["room_id"]
         else:
-            return abort(400)
+            return 400
 
         mydb = None
         try:
@@ -54,12 +61,11 @@ def add():
             cursor.execute(sql)
             mydb.commit()
 
-            return jsonify({"message" : "ok"})
+            return 200
         except:
-            return abort(500)
+            return 500
         finally:
             if(mydb.is_connected()):
                 mydb.close()
     else:
-        return abort(400)
-
+        return 400

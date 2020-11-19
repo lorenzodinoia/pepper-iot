@@ -17,35 +17,51 @@ room_blueprint = Blueprint('room', __name__)
 def add():
     if(request.json is not None):
         if("name" in request.json):
-            try:
-                mydb = mysql.connector.connect(
-                    user=constants.USER_DB,
-                    database=constants.DATABASE,
-                    password=constants.PASSWORD
-                )
-                cursor = mydb.cursor()
-
-                data = request.json
-                val = (data["name"])
-                sql = ("""INSERT INTO room (name_room) VALUES ("%s")""" % val)
-                cursor.execute(sql)
-                mydb.commit()
-
-                return jsonify({"message": "ok"})
-            except IntegrityError:
-                return jsonify({"message" : "Integrity violation"})
-            except Exception:
-                return abort(500)
-            finally:
-                if(mydb.is_connected()):
-                    mydb.close()
+            value = add_room(request.json)
+            if(value == 200):
+                return jsonify({"message" : "ok"})
+            else:
+                return abort(value)
         else:
             return abort(400)
     else:
         return abort(400)
 
+def add_room(data):
+    mydb = None
+    try:
+        mydb = mysql.connector.connect(
+            user=constants.USER_DB,
+            database=constants.DATABASE,
+            password=constants.PASSWORD
+        )
+        cursor = mydb.cursor()
+
+        val = (data["name"])
+        sql = ("""INSERT INTO room (name_room) VALUES ("%s")""" % val)
+        cursor.execute(sql)
+        mydb.commit()
+
+        return 200
+    except IntegrityError:
+        return 400
+    except Exception:
+        return 500
+    finally:
+        if(mydb.is_connected()):
+            mydb.close()
+
+
 @room_blueprint.route("/all", methods=["GET"]) #Get list of all avaible rooms
 def get_all():
+    value = get_rooms_list()
+    if(value is not 500):
+        return jsonify(value)
+    else:
+        return abort(value)
+
+def get_rooms_list():
+    mydb = None
     try:
         mydb = mysql.connector.connect(
             user=constants.USER_DB,
@@ -60,11 +76,9 @@ def get_all():
         for row in cursor.fetchall():
             room_list.append(dict(zip(room_columns, row)))
 
-        return jsonify(room_list)
-
+        return room_list
     except Exception:
-        return abort(500)
+        return 500
     finally:
         if(mydb.is_connected()):
             mydb.close()
-
