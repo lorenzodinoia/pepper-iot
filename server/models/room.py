@@ -41,7 +41,7 @@ def add():
     else:
         return abort(400)
 
-@room_blueprint.route("/all", methods=["GET"])
+@room_blueprint.route("/all", methods=["GET"]) #Get list of all avaible rooms
 def get_all():
     try:
         mydb = mysql.connector.connect(
