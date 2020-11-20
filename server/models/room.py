@@ -35,7 +35,7 @@ class Room:
             if(mydb.is_connected()):
                 mydb.close()
 
-    def get_rooms_list():
+    def get_rooms_list(self):
         mydb = None
         try:
             mydb = mysql.connector.connect(
