@@ -31,7 +31,7 @@ except ProgrammingError:
     cursor.execute("CREATE DATABASE pepperiot")
     cursor.execute("USE pepperiot")
     cursor.execute("CREATE TABLE room (id int auto_increment primary key, name_room varchar(50) NOT NULL UNIQUE)")
-    cursor.execute("CREATE TABLE data_iot (id int auto_increment primary key, tmstp datetime NOT NULL, lux int, vox int, degree int, humidity int, room_id int, constraint fk_room foreign key (room_id) references room(id))")
+    cursor.execute("CREATE TABLE data_iot (id int auto_increment primary key, tmstp datetime NOT NULL, lux int, voc int, degree int, humidity int, room_id int, constraint fk_room foreign key (room_id) references room(id))")
     cursor.execute("CREATE TABLE emergency (id int auto_increment primary key, tmstp datetime NOT NULL, room_id int, data_id int, constraint fk_room_emergency foreign key (room_id) references room(id), constraint fk_data_emergency foreign key (data_id) references data_iot(id))")
     mydb.close()
 

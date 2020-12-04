@@ -19,14 +19,14 @@ class Data:
     def add_data(self, data):
         if(data is not None):
             self.lux = 0
-            self.vox = 0
+            self.voc = 0
             self.degree = 0
             self.humidity = 0
             self.room_id = None
             if("lux" in data):
                 self.lux = data["lux"]
-            if("vox" in data):
-                self.vox = data["vox"]
+            if("voc" in data):
+                self.voc = data["voc"]
             if("degree" in data):
                 self.degree = data["degree"]
             if("humidity" in data):
@@ -45,8 +45,8 @@ class Data:
                 )
                 cursor = mydb.cursor()
 
-                val = (self.lux, self.vox, self.degree, self.humidity, self.room_id)
-                sql = ("""INSERT INTO data_iot (tmstp, lux, vox, degree, humidity, room_id) VALUES (NOW(), %d, %d, %d, %d, %d)""" % val)
+                val = (self.lux, self.voc, self.degree, self.humidity, self.room_id)
+                sql = ("""INSERT INTO data_iot (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %d, %d, %d, %d)""" % val)
                 
                 cursor.execute(sql)
                 mydb.commit()
