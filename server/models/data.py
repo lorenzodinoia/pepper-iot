@@ -46,7 +46,7 @@ class Data:
                 cursor = mydb.cursor()
 
                 val = (self.lux, self.voc, self.degree, self.humidity, self.room_id)
-                sql = ("""INSERT INTO data_iot (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %d, %d, %d, %d)""" % val)
+                sql = ("""INSERT INTO data_iot (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %d, %0.1f, %d, %d)""" % val)
                 
                 cursor.execute(sql)
                 mydb.commit()
