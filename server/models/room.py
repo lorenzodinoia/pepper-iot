@@ -1,10 +1,11 @@
+import os
+import constants
+import mysql.connector
 from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
-import mysql.connector
-from mysql.connector.errors import Error, IntegrityError
-import constants
+from mysql.connector.errors import IntegrityError
 
 class Room:
     def __init__(self, id : int, name : str):
@@ -15,9 +16,9 @@ class Room:
         mydb = None
         try:
             mydb = mysql.connector.connect(
-                user=constants.USER_DB,
-                database=constants.DATABASE,
-                password=constants.PASSWORD
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
 
@@ -39,9 +40,9 @@ class Room:
         mydb = None
         try:
             mydb = mysql.connector.connect(
-                user=constants.USER_DB,
-                database=constants.DATABASE,
-                password=constants.PASSWORD
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
 

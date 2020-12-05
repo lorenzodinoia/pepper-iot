@@ -1,10 +1,11 @@
+import os
+import constants
+import mysql.connector
 from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
 from flask import json
-import mysql.connector
-import constants
 
 class Data:
     def __init__(self, id : int, timestamp : str, lux : int, voc : int, degree : int, humidity : int, room_id : int):
@@ -39,9 +40,9 @@ class Data:
             mydb = None
             try:
                 mydb = mysql.connector.connect(
-                user=constants.USER_DB,
-                database=constants.DATABASE,
-                password=constants.PASSWORD
+                    user = os.getenv("DATABASE_USER"),
+                    database = os.getenv("DATABASE_NAME"),
+                    password = os.getenv("DATABASE_PASSWORD")
                 )
                 cursor = mydb.cursor()
 

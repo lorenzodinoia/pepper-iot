@@ -1,11 +1,12 @@
+import os
+import constants
+from models.data import Data
 from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
 from flask import json
 import mysql.connector
-from models.data import Data
-import constants
 
 class Emergency:
     def __init__(self, id : int ,timestamp : str, room_id : int, data_id : int):
@@ -18,9 +19,9 @@ class Emergency:
         mydb = None
         try:
             mydb = mysql.connector.connect(
-            user = constants.USER_DB,
-            database = constants.DATABASE,
-            password = constants.PASSWORD
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
 
@@ -41,10 +42,10 @@ class Emergency:
         mydb = None
         try:
             mydb = mysql.connector.connect(
-                user = constants.USER_DB,
-                database = constants.DATABASE,
-                password = constants.PASSWORD
-                )
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
             cursor = mydb.cursor()
 
             sql = "SELECT * FROM emergency ORDER BY tmstp ASC LIMIT 1"
@@ -68,9 +69,9 @@ class Emergency:
         mydb = None
         try:
             mydb = mysql.connector.connect(
-                user = constants.USER_DB,
-                database = constants.DATABASE,
-                password = constants.PASSWORD
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
 

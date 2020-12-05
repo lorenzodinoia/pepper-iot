@@ -1,30 +1,46 @@
+import os
+import constants
 import mysql.connector
+from os.path import join, dirname
+from dotenv import load_dotenv
 from flask import Flask
 from flask import jsonify
-from mysql.connector.errors import DatabaseError, ProgrammingError
+from mysql.connector.errors import ProgrammingError
 from models.data import data_blueprint
 from models.room import room_blueprint
 from models.emergency import emergency_blueprint
-import constants
+
+def load_settings() -> bool:
+    env_path = join(dirname(__file__), ".env")
+    success = os.path.isfile(env_path) and load_dotenv(env_path)
+    if success:
+        print("Settings loaded successfully")
+    else:
+        print("ERROR: Settings not loaded")
+    return success
+
+
+
+if not load_settings(): #Loads env variables, if not loaded the script ends
+    exit()
 
 app = Flask(__name__) #Server instance
-
-app.register_blueprint(data_blueprint, url_prefix=constants.DATA_API_PREFIX)
-app.register_blueprint(room_blueprint, url_prefix=constants.ROOM_API_PREFIX)
-app.register_blueprint(emergency_blueprint, url_prefix=constants.EMERGENCY_API_PREFIX)
+app.register_blueprint(data_blueprint, url_prefix = constants.DATA_API_PREFIX)
+app.register_blueprint(room_blueprint, url_prefix = constants.ROOM_API_PREFIX)
+app.register_blueprint(emergency_blueprint, url_prefix = constants.EMERGENCY_API_PREFIX)
 
 #Try to create a connection with DB
 try:
     mydb = mysql.connector.connect(
-        user=constants.USER_DB,
-        database=constants.DATABASE,
-        password=constants.PASSWORD
+        user = os.getenv("DATABASE_USER"),
+        database = os.getenv("DATABASE_NAME"),
+        password = os.getenv("DATABASE_PASSWORD")
     )
 except ProgrammingError:
     #If the DB is not found, it is created
     mydb = mysql.connector.connect(
-        user=constants.USER_DB,
-        password=constants.PASSWORD
+        user = os.getenv("DATABASE_USER"),
+        password = os.getenv("DATABASE_PASSWORD")
     )
 
     cursor = mydb.cursor()
@@ -41,4 +57,4 @@ def home():
     return jsonify({"message": "Hello, World!"})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True) #Run server
+    app.run(host = "0.0.0.0", port = os.getenv("SERVER_PORT"), debug = os.getenv("DEBUG_MODE")) #Run server
