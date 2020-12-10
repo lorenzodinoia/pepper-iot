@@ -5,7 +5,10 @@
         <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
-    <Resources />
+    <Resources>
+        <File name="index" src="html/index.html" />
+        <File name="main" src="html/js/main.js" />
+    </Resources>
     <Topics />
     <IgnoredPaths />
     <Translations auto-fill="it_IT">

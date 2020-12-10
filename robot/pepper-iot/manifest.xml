@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <package uuid="pepper-iot-a668a9" version="0.0.0">
  <names>
-  <name lang="en_US">Untitled</name>
+  <name lang="en_US">pepperiot</name>
   <name lang="it_IT">pepperiot</name>
  </names>
  <supportedLanguages>
@@ -13,7 +13,10 @@
  <contents>
   <behaviorContent path="behavior_1">
    <userRequestable/>
-   <nature>interactive</nature>
+   <nature></nature>
+   <names>
+    <name lang="it_IT">Routine</name>
+   </names>
    <permissions/>
   </behaviorContent>
  </contents>
