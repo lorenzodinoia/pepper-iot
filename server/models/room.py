@@ -8,9 +8,10 @@ from flask import abort
 from mysql.connector.errors import IntegrityError
 
 class Room:
-    def __init__(self, id : int, name : str):
+    def __init__(self, id : int, name : str, ward_id : int):
         self.id = id
         self.name = name
+        self.ward_id = ward_id
 
     def add_room(self, data):
         mydb = None
@@ -67,7 +68,7 @@ room_blueprint = Blueprint('room', __name__)
 def add():
     if(request.json is not None):
         if("name" in request.json):
-            obj = Room(None, None)
+            obj = Room(None, None, None)
             value = obj.add_room(request.json)
             if(value == 200):
                 return jsonify({"message" : "ok"})
@@ -81,9 +82,9 @@ def add():
 
 @room_blueprint.route("/all", methods=["GET"]) #Get list of all avaible rooms
 def get_all():
-    obj = Room(None, None)
+    obj = Room(None, None, None)
     value = obj.get_rooms_list()
-    if(value is not 500):
+    if(value != 500):
         return jsonify(value)
     else:
         return abort(value)

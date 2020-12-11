@@ -1,4 +1,9 @@
 #Prefix for API
-DATA_API_PREFIX = "/data"
+WARD_API_PREFIX = "/ward"
+INMATE_API_PREFIX = "/inmate"
+DOCTOR_API_PREFIX = "/doctor"
+BED_API_PREFIX = "/bed"
+ENV_DATA_API_PREFIX = "/evn_data"
 ROOM_API_PREFIX = "/room"
+VITAL_DATA_API_PREFIX = "/vital_data"
 EMERGENCY_API_PREFIX = "/emergency"

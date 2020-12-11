@@ -7,7 +7,7 @@ from flask import jsonify
 from flask import abort
 from flask import json
 
-class Data:
+class Environmental_data:
     def __init__(self, id : int, timestamp : str, lux : int, voc : int, degree : int, humidity : int, room_id : int):
         self.id = id
         self.timestamp = timestamp
@@ -66,12 +66,12 @@ class Data:
 
 
 
-data_blueprint = Blueprint('data', __name__)
+env_data_blueprint = Blueprint('env_data', __name__)
 
-@data_blueprint.route("/add", methods=["POST"]) #Add a new record
+@env_data_blueprint.route("/add", methods=["POST"]) #Add a new record
 def add():
     data = request.json
-    obj = Data(None, None, None, None, None, None, None)
+    obj = Environmental_data(None, None, None, None, None, None, None)
     value = obj.add_data(data)
     if(value == 200):
         return jsonify({"message" : "ok"})
