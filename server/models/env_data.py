@@ -77,3 +77,24 @@ def add():
         return jsonify({"message" : "ok"})
     else:
         return abort(value)
+
+@data_blueprint.route("/")
+def get_latest():
+    try:
+        mydb = mysql.connector.connect(
+            user = os.getenv("DATABASE_USER"),
+            database = os.getenv("DATABASE_NAME"),
+            password = os.getenv("DATABASE_PASSWORD")
+        )
+        cursor = mydb.cursor()
+        cursor.execute("SELECT * FROM room INNER JOIN data_iot ON room.id = data_iot.room_id WHERE data_iot.id IN (SELECT MAX(id) FROM pepperiot.data_iot GROUP BY room_id)")
+        columns = [column[0] for column in cursor.description]
+        data = []
+        for row in cursor.fetchall():
+            data.append(dict(zip(columns, row)))
+        return jsonify(data)
+    except Exception:
+        return abort(500)
+    finally:
+        if mydb.is_connected():
+            mydb.close()

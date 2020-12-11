@@ -37,6 +37,23 @@
         </message>
     </context>
     <context>
+        <name>behavior_1/behavior.xar:/Explore/Finished</name>
+        <message>
+            <location filename="behavior_1/behavior.xar" line="0"/>
+            <source>Ho finito l'esplorazione</source>
+            <comment>Text</comment>
+            <translation type="unfinished">Ho finito l'esplorazione</translation>
+        </message>
+    </context>
+    <context>
+        <name>behavior_1/behavior.xar:/Explore/Say</name>
+        <message>
+            <source>Ciao</source>
+            <comment>Text</comment>
+            <translation type="vanished">Ciao</translation>
+        </message>
+    </context>
+    <context>
         <name>behavior_1/behavior.xar:/Pepper routine/Error</name>
         <message>
             <source>Errore richiesta dati</source>
@@ -107,6 +124,11 @@
             <comment>Text</comment>
             <translation type="obsolete">Sono connesso</translation>
         </message>
+        <message>
+            <source>Ho finito</source>
+            <comment>Text</comment>
+            <translation type="obsolete">Ho finito</translation>
+        </message>
     </context>
     <context>
         <name>behavior_1/behavior.xar:/Say (1)</name>
@@ -129,7 +151,7 @@
             <translation type="obsolete">Sono connesso</translation>
         </message>
         <message>
-            <location filename="../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../Program Files (x86)/Softbank Robotics/Choregraphe Suite 2.5/translations/behavior_1/behavior.xar" line="0"/>
+            <location filename="../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../../Program Files (x86)/Softbank Robotics/Choregraphe Suite 2.5/translations/behavior_1/behavior.xar" line="0"/>
             <source></source>
             <comment>Text</comment>
             <translation></translation>
