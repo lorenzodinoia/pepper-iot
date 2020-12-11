@@ -5,6 +5,7 @@ from os.path import join, dirname
 from dotenv import load_dotenv
 from flask import Flask
 from flask import jsonify
+from flask_cors import CORS
 from mysql.connector.errors import ProgrammingError
 from models.data import data_blueprint
 from models.room import room_blueprint
@@ -28,6 +29,7 @@ app = Flask(__name__) #Server instance
 app.register_blueprint(data_blueprint, url_prefix = constants.DATA_API_PREFIX)
 app.register_blueprint(room_blueprint, url_prefix = constants.ROOM_API_PREFIX)
 app.register_blueprint(emergency_blueprint, url_prefix = constants.EMERGENCY_API_PREFIX)
+CORS(app)
 
 #Try to create a connection with DB
 try:
