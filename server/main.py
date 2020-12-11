@@ -7,7 +7,12 @@ from flask import Flask
 from flask import jsonify
 from flask_cors import CORS
 from mysql.connector.errors import ProgrammingError
-from models.data import data_blueprint
+from models.ward import ward_blueprint
+from models.inmate import inmate_blueprint
+from models.env_data import env_data_blueprint
+from models.vital_data import vital_data_blueprint
+from models.bed import bed_blueprint
+from models.doctor import doctor_blueprint
 from models.room import room_blueprint
 from models.emergency import emergency_blueprint
 
@@ -26,7 +31,12 @@ if not load_settings(): #Loads env variables, if not loaded the script ends
     exit()
 
 app = Flask(__name__) #Server instance
-app.register_blueprint(data_blueprint, url_prefix = constants.DATA_API_PREFIX)
+app.register_blueprint(ward_blueprint, url_prefix = constants.WARD_API_PREFIX)
+app.register_blueprint(bed_blueprint, url_prefix = constants.BED_API_PREFIX)
+app.register_blueprint(inmate_blueprint, url_prefix = constants.INMATE_API_PREFIX)
+app.register_blueprint(env_data_blueprint, url_prefix = constants.ENV_DATA_API_PREFIX)
+app.register_blueprint(vital_data_blueprint, url_prefix = constants.VITAL_DATA_API_PREFIX)
+app.register_blueprint(doctor_blueprint, url_prefix = constants.DOCTOR_API_PREFIX)
 app.register_blueprint(room_blueprint, url_prefix = constants.ROOM_API_PREFIX)
 app.register_blueprint(emergency_blueprint, url_prefix = constants.EMERGENCY_API_PREFIX)
 CORS(app)
@@ -48,9 +58,14 @@ except ProgrammingError:
     cursor = mydb.cursor()
     cursor.execute("CREATE DATABASE pepperiot")
     cursor.execute("USE pepperiot")
-    cursor.execute("CREATE TABLE room (id int auto_increment primary key, name_room varchar(50) NOT NULL UNIQUE)")
-    cursor.execute("CREATE TABLE data_iot (id int auto_increment primary key, tmstp datetime NOT NULL, lux int, voc float, degree int, humidity int, room_id int, constraint fk_room foreign key (room_id) references room(id))")
-    cursor.execute("CREATE TABLE emergency (id int auto_increment primary key, tmstp datetime NOT NULL, room_id int, data_id int, constraint fk_room_emergency foreign key (room_id) references room(id), constraint fk_data_emergency foreign key (data_id) references data_iot(id))")
+    cursor.execute("CREATE TABLE ward (id int auto_increment primary key, name_ward varchar(50) NOT NULL UNIQUE)")
+    cursor.execute("CREATE TABLE room (id int auto_increment primary key, name_room varchar(50) NOT NULL UNIQUE, ward_id int, constraint fk_ward_room foreign key (ward_id) references ward(id), UNIQUE KEY unique_bed_ward (name_room, ward_id))")
+    cursor.execute("CREATE TABLE inmate (id int auto_increment primary key, name varchar(50), surname varchar(50), CF varchar(16) UNIQUE, date_birth date)")
+    cursor.execute("CREATE TABLE bed (id int auto_increment primary key, inmate_id int, room_id int, constraint fk_inmate foreign key (inmate_id) references inmate(id), constraint fk_room_bed foreign key (room_id) references room(id))")
+    cursor.execute("CREATE TABLE doctor (id int auto_increment primary key, name varchar(50), surname varchar(50), CF varchar(16) UNIQUE, ward_id int, constraint fk_ward_doctor foreign key (ward_id) references ward(id))")
+    cursor.execute("CREATE TABLE environmental_data (id int auto_increment primary key, tmstp datetime NOT NULL, lux int, voc float, degree float, humidity int, room_id int, constraint fk_room foreign key (room_id) references room(id))")
+    cursor.execute("CREATE TABLE vital_signs (id int auto_increment primary key, tmstp datetime NOT NULL, BPM int, body_temperature float, body_pressure int, bed_id int, constraint fk_bed_data foreign key (bed_id) references bed(id))")
+    cursor.execute("CREATE TABLE emergency (id int auto_increment primary key, tmstp datetime NOT NULL, bed_id int, environmental_data_id int, vital_signs_id int, constraint fk_bed_emergency foreign key (bed_id) references bed(id), constraint fk_env_data_emergency foreign key (environmental_data_id) references environmental_data(id), constraint fk_vital_data_emergency foreign key (vital_signs_id) references vital_signs(id))")
     mydb.close()
 
 
