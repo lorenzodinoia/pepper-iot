@@ -7,7 +7,9 @@
     <Dialogs />
     <Resources>
         <File name="index" src="html/index.html" />
-        <File name="main" src="html/js/main.js" />
+        <File name="setup" src="html/setup.html" />
+        <File name="index" src="html/js/index.js" />
+        <File name="setup" src="html/js/setup.js" />
     </Resources>
     <Topics />
     <IgnoredPaths />
