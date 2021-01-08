@@ -19,6 +19,11 @@ pip install python-dotenv
 pip install mysql-connector-python
 ```
 
+- **CORS**
+```
+pip install flask-cors
+```
+
 ### Environement settings
 Creates an `.env` file in root directory with the following content. Replaces values according to your preferences and machine settings
 ```
