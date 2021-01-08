@@ -53,3 +53,21 @@ Choose server IP address and assigned room launching [setup](raspberry/setup.py)
 ### Run
 1. Launch server application
 2. Launch [sensor_manager](raspberry/sensor_manager.py)
+
+## Dashbaord
+First install [Node.js](https://nodejs.org/dist/v14.15.4/node-v14.15.4-x64.msi), then install Angular globally
+
+- **Angular CLI**
+```
+npm install -g @angular/cli
+```
+
+Now move in the dashbaord directory and install the project dependencies with the following command
+
+- **Dependecies**
+```
+npm install
+```
+
+Run the dashbaord with `ng serve --open`<br>
+See [dashboard's instructions](dashboard/README.md) for more details
