@@ -74,7 +74,24 @@ class Room:
             for row in cursor.fetchall():
                 room_list.append(dict(zip(room_columns, row)))
 
-            return room_list
+            #Create bed collection for each room
+            rooms = []
+            for room in room_list:
+                inmate = {'id': room['inmate_id'], 'name': room['name'], 'surname': room['surname']}
+                bed = {'id': room['bed_id'], 'inmate': inmate}
+                founded_rooms = list(filter(lambda element: element.get('id') == room['id'], rooms))
+                if len(founded_rooms) == 0: #Room doesn't exists
+                    room_id = room['id']
+                    room_name = room['name_room']
+                    room_beds = []
+                    room_beds.append(bed)
+                    new_room = {'id': room_id, 'name': room_name, 'beds': room_beds}
+                    rooms.append(new_room)
+                else:
+                    existing_room = founded_rooms[0]
+                    existing_room['beds'].append(bed)             
+
+            return rooms
         except:
             return 500
         finally:
