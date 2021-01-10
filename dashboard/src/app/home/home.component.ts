@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Client } from '../client';
+import { Room } from '../models/room';
 
 @Component({
   selector: 'home',
@@ -6,10 +8,24 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
+  private _rooms: Array<Room> = [];
 
-  constructor() { }
+  constructor(private _client: Client) { }
 
-  ngOnInit(): void {
+  public get rooms(): Array<Room> {
+    return this._rooms;
   }
 
+  public set rooms(value: Array<Room>) {
+    this._rooms = value;
+  }
+
+  ngOnInit(): void {
+    Room.getAll(this._client).subscribe((successResponse) => {
+      if (successResponse instanceof Array) {
+        this.rooms = successResponse;
+      }
+    });
+  }
+  
 }

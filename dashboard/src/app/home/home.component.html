@@ -2,7 +2,11 @@
 <html>
     <body>
         <div class="container-fluid">
-            <h1>Hello world!</h1>
+            <div class="row">
+                <div class="col" *ngFor="let room of rooms">
+                    <room-card [room]="room"></room-card>
+                </div>
+            </div>
         </div>
     </body>
 </html>
