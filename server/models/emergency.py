@@ -1,6 +1,5 @@
 import os
 import constants
-from models.data import Data
 from flask import Blueprint
 from flask import request
 from flask import jsonify

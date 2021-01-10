@@ -5,7 +5,6 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
-from flask import json
 
 class Environmental_data:
     def __init__(self, id : int, timestamp : str, lux : int, voc : int, degree : int, humidity : int, room_id : int):
@@ -47,7 +46,7 @@ class Environmental_data:
                 cursor = mydb.cursor()
 
                 val = (self.lux, self.voc, self.degree, self.humidity, self.room_id)
-                sql = ("""INSERT INTO data_iot (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %d, %0.1f, %d, %d)""" % val)
+                sql = ("""INSERT INTO environmental_data (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d)""" % val)
                 
                 cursor.execute(sql)
                 mydb.commit()
@@ -55,7 +54,8 @@ class Environmental_data:
                 self.id = cursor.lastrowid
 
                 return 200
-            except:
+            except Exception as e:
+                print(e)
                 return 500
             finally:
                 if(mydb.is_connected()):
@@ -78,7 +78,7 @@ def add():
     else:
         return abort(value)
 
-@data_blueprint.route("/")
+@env_data_blueprint.route("/")
 def get_latest():
     try:
         mydb = mysql.connector.connect(
@@ -93,7 +93,7 @@ def get_latest():
         for row in cursor.fetchall():
             data.append(dict(zip(columns, row)))
         return jsonify(data)
-    except Exception:
+    except:
         return abort(500)
     finally:
         if mydb.is_connected():
