@@ -63,6 +63,28 @@ class Environmental_data:
         else:
             return 400
 
+    def get_latest_data(self):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+            cursor.execute("SELECT * FROM room INNER JOIN environmental_data ON room.id = environmental_data.room_id WHERE environmental_data.id IN (SELECT MAX(id) FROM pepperiot.environmental_data GROUP BY room_id)")
+            columns = [column[0] for column in cursor.description]
+            data = []
+            for row in cursor.fetchall():
+                data.append(dict(zip(columns, row)))
+            return data
+        except Exception as e:
+            print(e)
+            return 500
+        finally:
+            if mydb.is_connected():
+                mydb.close()
+
 
 
 
@@ -80,21 +102,9 @@ def add():
 
 @env_data_blueprint.route("/")
 def get_latest():
-    try:
-        mydb = mysql.connector.connect(
-            user = os.getenv("DATABASE_USER"),
-            database = os.getenv("DATABASE_NAME"),
-            password = os.getenv("DATABASE_PASSWORD")
-        )
-        cursor = mydb.cursor()
-        cursor.execute("SELECT * FROM room INNER JOIN data_iot ON room.id = data_iot.room_id WHERE data_iot.id IN (SELECT MAX(id) FROM pepperiot.data_iot GROUP BY room_id)")
-        columns = [column[0] for column in cursor.description]
-        data = []
-        for row in cursor.fetchall():
-            data.append(dict(zip(columns, row)))
-        return jsonify(data)
-    except:
-        return abort(500)
-    finally:
-        if mydb.is_connected():
-            mydb.close()
+    obj = Environmental_data(None, None, None, None, None, None, None)
+    value = obj.get_latest_data()
+    if(value != 500):
+        return jsonify(value)
+    else:
+        return abort(value)
