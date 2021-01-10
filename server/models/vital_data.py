@@ -1,7 +1,7 @@
 import os
 import constants
 import mysql.connector
-from flask import Blueprint
+from flask import Blueprint, json
 from flask import request
 from flask import jsonify
 from flask import abort
@@ -60,6 +60,30 @@ class Vital_data:
                 mydb.close()
             else:
                 return 400
+    
+    def get_latest_data(self, room_id):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+
+            val = (room_id)
+            cursor.execute("SELECT inmate_vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, inmate_vital_signs.inmate_id, name, surname, cf, date_birth, bed.id AS bed_id FROM bed INNER JOIN (SELECT last_vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, inmate_id, name, surname, cf, date_birth FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id) AS inmate_vital_signs ON bed.inmate_id = inmate_vital_signs.inmate_id WHERE bed.room_id = %d" % val)
+            columns = [column[0] for column in cursor.description]
+            data = []
+            for row in cursor.fetchall():
+                data.append(dict(zip(columns, row)))
+            return data
+        except Exception as e:
+            print(e)
+            return 500
+        finally:
+            if mydb.is_connected():
+                mydb.close()
 
 vital_data_blueprint = Blueprint('vital_data', __name__)
 
@@ -72,3 +96,16 @@ def add():
         return jsonify({"message" : "ok"})
     else:
         return abort(value)
+
+@vital_data_blueprint.route("/")
+def get_latest():
+    room_id = request.args.get("room_id", default=None, type=int)
+    if(room_id is not None):
+        obj = Vital_data(None, None, None, None, None, None, None)
+        value = obj.get_latest_data(room_id)
+        if(value != 500):
+            return jsonify(value)
+        else:
+            return abort(400)
+    else:
+        return abort(400)

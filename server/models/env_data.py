@@ -1,5 +1,4 @@
 import os
-import constants
 import mysql.connector
 from flask import Blueprint
 from flask import request
@@ -78,8 +77,7 @@ class Environmental_data:
             for row in cursor.fetchall():
                 data.append(dict(zip(columns, row)))
             return data
-        except Exception as e:
-            print(e)
+        except:
             return 500
         finally:
             if mydb.is_connected():
