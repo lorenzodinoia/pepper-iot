@@ -123,26 +123,15 @@ class Room:
             for row in cursor.fetchall():
                 bed_list.append(dict(zip(room_columns, row)))
 
-            #Usare env_datas e bed_list
             bed_results = []
             for bed_element in bed_list:
-                """
-                env_data_room = None
-                for env_data in env_datas:
-                    if env_data['room_id'] == bed_element['room_id']:
-                        env_data_room = env_data
-                """
                 vital_signs = {'id' : bed_element['last_vital_signs_id'], 'tmstp' : bed_element['lvs_tmstp'], 'bpm' : bed_element['bpm'], 'body_temperature' : bed_element['body_temperature'], 'body_pressure' : bed_element['body_pressure'], 'blood_oxygenation' : bed_element['blood_oxygenation']}
                 inmate = {'id': bed_element['inmate_id'], 'name': bed_element['name'], 'surname': bed_element['surname'], 'cf' : bed_element['cf'], 'date_birth' : bed_element['date_birth'], 'vital_signs' : vital_signs}
                 bed = {'id': bed_element['bed_id'], 'inmate': inmate}
-                #env_data = {'id' : env_data_room['id'],  'tmstp' : env_data_room['tmstp'], 'lux' : env_data_room['lux'], 'voc' : env_data_room['voc'], 'degree' : env_data_room['degree'], 'humidity' : env_data_room['humidity']}
                 bed_results.append(bed)
             
             env_data = {'id' : env_datas[0]['id'], 'tmstp' : env_datas[0]['tmstp'], 'lux' : env_datas[0]['lux'], 'voc' : env_datas[0]['voc'], 'degree' : env_datas[0]['degree'], 'humidity' : env_datas[0]['humidity']}
             room = {'id' : self.id, 'name' : env_datas[0]['name_room'],'beds' : bed_results, 'env_data' : env_data}
-
-
-
                 
             return room
         except Exception as e:
