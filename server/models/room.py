@@ -176,7 +176,7 @@ def get_all():
 
 @room_blueprint.route("/", methods=["GET"]) #Get the single room with last env_data and all inmates
 def get():
-    room_id = request.args.get("room_id", default=None, type=int)
+    room_id = request.args.get("id", default=None, type=int)
     if(room_id is not None):
         obj = Room(room_id, None)
         value = obj.get_room()

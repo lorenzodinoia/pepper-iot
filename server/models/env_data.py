@@ -76,7 +76,14 @@ class Environmental_data:
             data = []
             for row in cursor.fetchall():
                 data.append(dict(zip(columns, row)))
-            return data
+
+            room_list = []
+            for element in data:
+                env_data = {'id' : element['id'], 'tmstp' : element['tmstp'], 'lux' : element['lux'], 'voc' : element['voc'], 'degree' : element['degree'], 'humidity' : element['humidity']}
+                room = {'id' : element['room_id'], 'name' : element['name_room'], 'env_data' : env_data}
+                room_list.append(room)
+
+            return room_list
         except:
             return 500
         finally:

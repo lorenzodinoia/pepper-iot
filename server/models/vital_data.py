@@ -1,7 +1,6 @@
 import os
-import constants
 import mysql.connector
-from flask import Blueprint, json
+from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
@@ -61,7 +60,7 @@ class Vital_data:
             else:
                 return 400
     
-    def get_latest_data(self, room_id):
+    def get_latest_data(self):
         mydb = None
         try:
             mydb = mysql.connector.connect(
@@ -71,15 +70,19 @@ class Vital_data:
             )
             cursor = mydb.cursor()
 
-            val = (room_id)
-            cursor.execute("SELECT inmate_vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, inmate_vital_signs.inmate_id, name, surname, cf, date_birth, bed.id AS bed_id FROM bed INNER JOIN (SELECT last_vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, inmate_id, name, surname, cf, date_birth FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id) AS inmate_vital_signs ON bed.inmate_id = inmate_vital_signs.inmate_id WHERE bed.room_id = %d" % val)
+            val = (self.inmate_id)
+            cursor.execute("SELECT inmate_vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, inmate_vital_signs.inmate_id, name, surname, cf, date_birth, bed.id AS bed_id FROM bed INNER JOIN (SELECT last_vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, inmate_id, name, surname, cf, date_birth FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id) AS inmate_vital_signs ON bed.inmate_id = inmate_vital_signs.inmate_id WHERE inmate_vital_signs.inmate_id = %d" % val)
             columns = [column[0] for column in cursor.description]
             data = []
             for row in cursor.fetchall():
                 data.append(dict(zip(columns, row)))
-            return data
-        except Exception as e:
-            print(e)
+            
+            inmate_v_s = data[0]
+            vital_signs = {'id' : inmate_v_s['id'], 'tmstp' : inmate_v_s['tmstp'], 'bpm' : inmate_v_s['bpm'], 'body_temperature' : inmate_v_s['body_temperature'], 'body_pressure' : inmate_v_s['body_pressure'], 'blood_oxygenation' : inmate_v_s['blood_oxygenation']}
+            inmate = {'id': inmate_v_s['inmate_id'], 'name': inmate_v_s['name'], 'surname': inmate_v_s['surname'], 'cf' : inmate_v_s['cf'], 'date_birth' : inmate_v_s['date_birth'], 'vital_signs' : vital_signs}
+
+            return inmate
+        except:
             return 500
         finally:
             if mydb.is_connected():
@@ -99,10 +102,10 @@ def add():
 
 @vital_data_blueprint.route("/")
 def get_latest():
-    room_id = request.args.get("room_id", default=None, type=int)
-    if(room_id is not None):
-        obj = Vital_data(None, None, None, None, None, None, None)
-        value = obj.get_latest_data(room_id)
+    inmate_id = request.args.get("inmate_id", default=None, type=int)
+    if(inmate_id is not None):
+        obj = Vital_data(None, None, None, None, None, None, inmate_id)
+        value = obj.get_latest_data()
         if(value != 500):
             return jsonify(value)
         else:

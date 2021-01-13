@@ -90,7 +90,7 @@ def add():
     else:
         return abort(400)
 
-@bed_blueprint.route("/get", methods=["GET"]) #Get bed from id
+@bed_blueprint.route("/", methods=["GET"]) #Get bed from id
 def get():
     bed_id = request.args.get("id", default=None, type=int)
     if(bed_id is not None):
