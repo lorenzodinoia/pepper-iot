@@ -1,5 +1,4 @@
 import os
-import constants
 import mysql.connector
 from flask import Blueprint
 from flask import request
@@ -98,6 +97,59 @@ class Room:
             if(mydb.is_connected()):
                 mydb.close()
 
+
+    def get_room(self):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                    user = os.getenv("DATABASE_USER"),
+                    database = os.getenv("DATABASE_NAME"),
+                    password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+            val = (self.id)
+
+            sql = ("""SELECT * FROM latest_env_data WHERE room_id = %d""" % val)
+            cursor.execute(sql)
+            env_data_columns = [column[0] for column in cursor.description]
+            env_datas = []
+            for row in cursor.fetchall():
+                env_datas.append(dict(zip(env_data_columns, row)))
+
+            sql = ("""SELECT bed.room_id, bed.id as bed_id, lvsi.* FROM bed INNER JOIN (SELECT last_vital_signs.id as last_vital_signs_id, last_vital_signs.tmstp AS lvs_tmstp, last_vital_signs.bpm, last_vital_signs.body_temperature, last_vital_signs.body_pressure, last_vital_signs.blood_oxygenation, last_vital_signs.inmate_id, inmate.name, inmate.surname, inmate.cf, inmate.date_birth FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id) AS lvsi ON bed.inmate_id = lvsi.inmate_id WHERE bed.room_id = %d""" % val)
+            cursor.execute(sql)
+            room_columns = [column[0] for column in cursor.description]
+            bed_list = []
+            for row in cursor.fetchall():
+                bed_list.append(dict(zip(room_columns, row)))
+
+            #Usare env_datas e bed_list
+            bed_results = []
+            for bed_element in bed_list:
+                """
+                env_data_room = None
+                for env_data in env_datas:
+                    if env_data['room_id'] == bed_element['room_id']:
+                        env_data_room = env_data
+                """
+                vital_signs = {'id' : bed_element['last_vital_signs_id'], 'tmstp' : bed_element['lvs_tmstp'], 'bpm' : bed_element['bpm'], 'body_temperature' : bed_element['body_temperature'], 'body_pressure' : bed_element['body_pressure'], 'blood_oxygenation' : bed_element['blood_oxygenation']}
+                inmate = {'id': bed_element['inmate_id'], 'name': bed_element['name'], 'surname': bed_element['surname'], 'cf' : bed_element['cf'], 'date_birth' : bed_element['date_birth'], 'vital_signs' : vital_signs}
+                bed = {'id': bed_element['bed_id'], 'inmate': inmate}
+                #env_data = {'id' : env_data_room['id'],  'tmstp' : env_data_room['tmstp'], 'lux' : env_data_room['lux'], 'voc' : env_data_room['voc'], 'degree' : env_data_room['degree'], 'humidity' : env_data_room['humidity']}
+                bed_results.append(bed)
+            
+            env_data = {'id' : env_datas[0]['id'], 'tmstp' : env_datas[0]['tmstp'], 'lux' : env_datas[0]['lux'], 'voc' : env_datas[0]['voc'], 'degree' : env_datas[0]['degree'], 'humidity' : env_datas[0]['humidity']}
+            room = {'id' : self.id, 'name' : env_datas[0]['name_room'],'beds' : bed_results, 'env_data' : env_data}
+
+
+
+                
+            return room
+        except Exception as e:
+            print(e)
+            return 500
+        
+
 room_blueprint = Blueprint('room', __name__)
 
 @room_blueprint.route("/add", methods=["POST"]) #Add a new room
@@ -133,3 +185,16 @@ def get_all():
         return jsonify(value)
     else:
         return abort(value)
+
+@room_blueprint.route("/", methods=["GET"]) #Get the single room with last env_data and all inmates
+def get():
+    room_id = request.args.get("room_id", default=None, type=int)
+    if(room_id is not None):
+        obj = Room(room_id, None)
+        value = obj.get_room()
+        if(value != 500):
+            return jsonify(value)
+        else:
+            return abort(value)
+    else:
+        return abort(400)

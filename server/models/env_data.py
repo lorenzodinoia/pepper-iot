@@ -71,7 +71,7 @@ class Environmental_data:
                 password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
-            cursor.execute("SELECT * FROM room INNER JOIN environmental_data ON room.id = environmental_data.room_id WHERE environmental_data.id IN (SELECT MAX(id) FROM pepperiot.environmental_data GROUP BY room_id)")
+            cursor.execute("SELECT * FROM latest_env_data")
             columns = [column[0] for column in cursor.description]
             data = []
             for row in cursor.fetchall():

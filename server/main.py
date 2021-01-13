@@ -61,6 +61,7 @@ except ProgrammingError:
     cursor.execute("CREATE TABLE vital_signs (id int auto_increment primary key, tmstp datetime NOT NULL, bpm int, body_temperature float, body_pressure int, blood_oxygenation int, inmate_id int, constraint fk_inmate_data foreign key (inmate_id) references inmate(id))")
     cursor.execute("CREATE TABLE emergency (id int auto_increment primary key, tmstp datetime NOT NULL, bed_id int, environmental_data_id int, vital_signs_id int, constraint fk_bed_emergency foreign key (bed_id) references bed(id), constraint fk_env_data_emergency foreign key (environmental_data_id) references environmental_data(id), constraint fk_vital_data_emergency foreign key (vital_signs_id) references vital_signs(id))")
     cursor.execute("CREATE VIEW last_vital_signs AS (SELECT vital_signs.id, tmstp, bpm, body_temperature, body_pressure, blood_oxygenation, vital_signs.inmate_id from vital_signs WHERE vital_signs.id IN (SELECT MAX(id) FROM vital_signs GROUP BY inmate_id))")
+    cursor.execute("CREATE VIEW latest_env_data AS (SELECT environmental_data.id, tmstp, lux, voc, degree, humidity, room_id, name_room FROM room INNER JOIN environmental_data ON room.id = environmental_data.room_id WHERE environmental_data.id IN (SELECT MAX(id) FROM pepperiot.environmental_data GROUP BY room_id))")
 mydb.close()
 
 @app.route("/") #Home page route
