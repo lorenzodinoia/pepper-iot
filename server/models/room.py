@@ -134,8 +134,7 @@ class Room:
             room = {'id' : self.id, 'name' : env_datas[0]['name_room'],'beds' : bed_results, 'env_data' : env_data}
                 
             return room
-        except Exception as e:
-            print(e)
+        except:
             return 500
         
 

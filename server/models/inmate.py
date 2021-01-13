@@ -62,8 +62,7 @@ class Inmate:
         else:
             return  400
     
-    def get_inmate(self, id):
-        self.id = id
+    def get_inmate(self):
         mydb = None
         try:
             mydb = mysql.connector.connect(
@@ -73,8 +72,8 @@ class Inmate:
             )
             cursor = mydb.cursor()
 
-            val = (id)
-            sql = ("""SELECT * FROM inmate WHERE id = %s""" % val)
+            val = (self.id)
+            sql = ("""SELECT inmate.*, last_vital_signs.id AS lvs_id, last_vital_signs.tmstp, last_vital_signs.bpm, last_vital_signs.body_temperature, last_vital_signs.body_pressure, last_vital_signs.blood_oxygenation FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id WHERE inmate.id = %s""" % val)
 
             cursor.execute(sql)
             columns = [column[0] for column in cursor.description]
@@ -82,9 +81,12 @@ class Inmate:
             for row in cursor.fetchall():
                 data.append(dict(zip(columns, row)))
 
-            return data
-        except Exception as e:
-            print(e)
+            inmate_data = data[0]
+            vital_signs = {'id' : inmate_data['lvs_id'], 'tmstp' : inmate_data['tmstp'], 'bpm' : inmate_data['bpm'], 'body_temperature' : inmate_data['body_temperature'], 'body_pressure' : inmate_data['body_pressure'], 'blood_oxygenation' : inmate_data['blood_oxygenation']}
+            new_inmate = {'id' : inmate_data['id'], 'name' : inmate_data['name'], 'surname' : inmate_data['surname'], 'cf' : inmate_data['cf'], 'date_birth' : inmate_data['date_birth'], 'vital_signs' : vital_signs}
+
+            return new_inmate
+        except:
             return 500
         finally:
             if(mydb.is_connected()):
@@ -102,12 +104,12 @@ def add():
     else:
         return abort(value)
 
-@inmate_blueprint.route("/get", methods=["GET"]) #Get inmate from id
+@inmate_blueprint.route("/", methods=["GET"]) #Get inmate from id
 def get():
     inmate_id = request.args.get('id', default=None, type=int) #Use /inmate?id=... for URL parameter passing
     if(inmate_id is not None):
-        obj = Inmate(None, None, None, None, None)
-        value = obj.get_inmate(inmate_id)
+        obj = Inmate(inmate_id, None, None, None, None)
+        value = obj.get_inmate()
         if(value != 500):
             return jsonify(value)
         else:
