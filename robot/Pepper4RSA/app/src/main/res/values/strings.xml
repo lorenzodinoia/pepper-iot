@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pepper4RSA</string>
+    <string name="start_exploration">Inizia esplorazione</string>
+    <string name="message_server_unreachable" translatable="false">Servizio non disponibile</string>
+    <string name="message_404">L\'elemento non è disponibile</string>
+    <string name="message_500">C\'è un problema su server</string>
+    <string name="message_generic_error">Si è verificato un problema</string>
+</resources>

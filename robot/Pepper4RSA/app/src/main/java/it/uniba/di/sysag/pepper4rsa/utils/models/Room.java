@@ -1,0 +1,46 @@
+package it.uniba.di.sysag.pepper4rsa.utils.models;
+
+import android.os.Parcel;
+
+import com.google.gson.annotations.SerializedName;
+
+public class Room extends Model{
+
+    @SerializedName("name_room")
+    private String name;
+
+    public static final Creator<Room> CREATOR = new Creator<Room>() {
+        @Override
+        public Room createFromParcel(Parcel in) {
+            return new Room(in);
+        }
+
+        @Override
+        public Room[] newArray(int size) {
+            return new Room[size];
+        }
+    };
+
+    public Room() {
+
+    }
+
+    public Room(Parcel in) {
+        super(in);
+        this.name = in.readString();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        super.writeToParcel(dest, flags);
+        dest.writeString(this.name);
+    }
+}
