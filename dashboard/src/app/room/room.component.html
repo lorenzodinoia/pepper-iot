@@ -1,0 +1,46 @@
+<div class="container-fluid" *ngIf="room">
+    <h2>{{room.name}}</h2>
+    <p class="text-secondary">Ultimo aggiornamento: {{room.environmentalData.timestamp}}</p>
+    <hr class="divider"/>
+    <div class="row">
+        <div class="col">
+            <div class="card" style="width: 12rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Temperatura</h5>
+                    <h4>{{room.environmentalData.temperature}} C°</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 12rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Umidità</h5>
+                    <h4>{{room.environmentalData.humidity}} %</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 12rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Luminosità</h5>
+                    <h4>{{room.environmentalData.lux}} lux</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="width: 12rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Qualità dell'aria</h5>
+                    <h4>{{room.environmentalData.voc}} mg/m<sup>3</sup></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="container-fluid">
+        <div *ngFor="let bed of room.beds">
+            <inmate-summary [inmate]="bed.inmate"></inmate-summary>
+        </div>
+    </div>
+</div>

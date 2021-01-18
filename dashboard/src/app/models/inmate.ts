@@ -1,10 +1,12 @@
 import { Model } from "./model";
+import { VitalSigns } from "./vitalSigns";
 
 export class Inmate extends Model {
     private _name: string;
     private _surname: string;
     private _cf: string;
     private _birthDate: Date;
+    private _vitalSigns!: VitalSigns;
 
     constructor(id: number, name: string, surname: string, cf: string, birthDate: Date) {
         super(id);
@@ -30,6 +32,14 @@ export class Inmate extends Model {
         return this._birthDate;
     }
 
+    public get vitalSigns(): VitalSigns {
+        return this._vitalSigns;
+    }
+
+    public set vitalSigns(vitalSigns: VitalSigns) {
+        this._vitalSigns = vitalSigns;
+    }
+
     public static fromJSON(json: any): Inmate {
         let birthDate: Date = new Date();
         if ("birthdate" in json) {
@@ -39,6 +49,10 @@ export class Inmate extends Model {
         if ("cf" in json) {
             cf = json.cf;
         }
-        return new Inmate(json.id, json.name, json.surname, cf, birthDate);
+        let inmate = new Inmate(json.id, json.name, json.surname, cf, birthDate);
+        if ("vital_signs" in json) {
+            inmate.vitalSigns = VitalSigns.fromJSON(json.vital_signs);
+        }
+        return inmate;
     }
 }

@@ -8,6 +8,8 @@ import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { RoomCardComponent } from './room-card/room-card.component';
 import { BedCardComponent } from './bed-card/bed-card.component';
+import { RoomComponent } from './room/room.component';
+import { InmateSummaryComponent } from './inmate-summary/inmate-summary.component';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import { BedCardComponent } from './bed-card/bed-card.component';
     ToolbarComponent,
     HomeComponent,
     RoomCardComponent,
-    BedCardComponent
+    BedCardComponent,
+    RoomComponent,
+    InmateSummaryComponent
   ],
   imports: [
     BrowserModule,
