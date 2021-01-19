@@ -73,7 +73,7 @@ class Inmate:
             cursor = mydb.cursor()
 
             val = (self.id)
-            sql = ("""SELECT inmate.*, last_vital_signs.id AS lvs_id, last_vital_signs.tmstp, last_vital_signs.bpm, last_vital_signs.body_temperature, last_vital_signs.body_pressure, last_vital_signs.blood_oxygenation FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id WHERE inmate.id = %s""" % val)
+            sql = ("""SELECT inmate.*, last_vital_signs.id AS lvs_id, last_vital_signs.tmstp, last_vital_signs.bpm, last_vital_signs.body_temperature, last_vital_signs.min_body_pressure, last_vital_signs.max_body_pressure, last_vital_signs.blood_oxygenation FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id WHERE inmate.id = %s""" % val)
 
             cursor.execute(sql)
             columns = [column[0] for column in cursor.description]
@@ -82,7 +82,7 @@ class Inmate:
                 data.append(dict(zip(columns, row)))
 
             inmate_data = data[0]
-            vital_signs = {'id' : inmate_data['lvs_id'], 'tmstp' : inmate_data['tmstp'], 'bpm' : inmate_data['bpm'], 'body_temperature' : inmate_data['body_temperature'], 'body_pressure' : inmate_data['body_pressure'], 'blood_oxygenation' : inmate_data['blood_oxygenation']}
+            vital_signs = {'id' : inmate_data['lvs_id'], 'tmstp' : inmate_data['tmstp'], 'bpm' : inmate_data['bpm'], 'body_temperature' : inmate_data['body_temperature'], 'min_body_pressure' : inmate_data['min_body_pressure'], 'max_body_pressure' : inmate_data['max_body_pressure'], 'blood_oxygenation' : inmate_data['blood_oxygenation']}
             new_inmate = {'id' : inmate_data['id'], 'name' : inmate_data['name'], 'surname' : inmate_data['surname'], 'cf' : inmate_data['cf'], 'date_birth' : inmate_data['date_birth'], 'vital_signs' : vital_signs}
 
             return new_inmate

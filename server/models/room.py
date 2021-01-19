@@ -21,7 +21,7 @@ class Room:
             )
             cursor = mydb.cursor()
 
-            self.name = (data["name"])
+            self.name = (data["name_room"])
             sql = ("""INSERT INTO room (name_room) VALUES ("%s")""" % self.name)
             cursor.execute(sql)
             mydb.commit()
@@ -29,7 +29,8 @@ class Room:
             return 200
         except IntegrityError:
             return 400
-        except Exception:
+        except Exception as e:
+            print(e)
             return 500
         finally:
             if(mydb.is_connected()):
@@ -116,7 +117,7 @@ class Room:
             for row in cursor.fetchall():
                 env_datas.append(dict(zip(env_data_columns, row)))
 
-            sql = ("""SELECT bed.room_id, bed.id as bed_id, lvsi.* FROM bed INNER JOIN (SELECT last_vital_signs.id as last_vital_signs_id, last_vital_signs.tmstp AS lvs_tmstp, last_vital_signs.bpm, last_vital_signs.body_temperature, last_vital_signs.body_pressure, last_vital_signs.blood_oxygenation, last_vital_signs.inmate_id, inmate.name, inmate.surname, inmate.cf, inmate.date_birth FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id) AS lvsi ON bed.inmate_id = lvsi.inmate_id WHERE bed.room_id = %d""" % val)
+            sql = ("""SELECT bed.room_id, bed.id as bed_id, lvsi.* FROM bed INNER JOIN (SELECT last_vital_signs.id as last_vital_signs_id, last_vital_signs.tmstp AS lvs_tmstp, last_vital_signs.bpm, last_vital_signs.body_temperature, last_vital_signs.min_body_pressure, last_vital_signs.max_body_pressure, last_vital_signs.blood_oxygenation, last_vital_signs.inmate_id, inmate.name, inmate.surname, inmate.cf, inmate.date_birth FROM inmate INNER JOIN last_vital_signs ON inmate.id = last_vital_signs.inmate_id) AS lvsi ON bed.inmate_id = lvsi.inmate_id WHERE bed.room_id = %d""" % val)
             cursor.execute(sql)
             room_columns = [column[0] for column in cursor.description]
             bed_list = []
@@ -125,7 +126,7 @@ class Room:
 
             bed_results = []
             for bed_element in bed_list:
-                vital_signs = {'id' : bed_element['last_vital_signs_id'], 'tmstp' : bed_element['lvs_tmstp'], 'bpm' : bed_element['bpm'], 'body_temperature' : bed_element['body_temperature'], 'body_pressure' : bed_element['body_pressure'], 'blood_oxygenation' : bed_element['blood_oxygenation']}
+                vital_signs = {'id' : bed_element['last_vital_signs_id'], 'tmstp' : bed_element['lvs_tmstp'], 'bpm' : bed_element['bpm'], 'body_temperature' : bed_element['body_temperature'], 'min_body_pressure' : bed_element['min_body_pressure'], 'max_body_pressure' : bed_element['max_body_pressure'], 'blood_oxygenation' : bed_element['blood_oxygenation']}
                 inmate = {'id': bed_element['inmate_id'], 'name': bed_element['name'], 'surname': bed_element['surname'], 'cf' : bed_element['cf'], 'date_birth' : bed_element['date_birth'], 'vital_signs' : vital_signs}
                 bed = {'id': bed_element['bed_id'], 'inmate': inmate}
                 bed_results.append(bed)
@@ -134,7 +135,8 @@ class Room:
             room = {'id' : self.id, 'name' : env_datas[0]['name_room'],'beds' : bed_results, 'env_data' : env_data}
                 
             return room
-        except:
+        except Exception as e:
+            print(e)
             return 500
         
 
@@ -143,7 +145,7 @@ room_blueprint = Blueprint('room', __name__)
 @room_blueprint.route("/add", methods=["POST"]) #Add a new room
 def add():
     if(request.json is not None):
-        if("name" in request.json):
+        if("name_room" in request.json):
             obj = Room(None, None)
             value = obj.add_room(request.json)
             if(value == 200):
