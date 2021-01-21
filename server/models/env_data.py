@@ -1,9 +1,17 @@
 import os
 import mysql.connector
+from models.emergency import Emergency
 from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
+
+MIN_LUX = 401
+MAX_LUX = 1000
+MAX_VOC = 0.7
+MIN_DEGREE = 15
+MAX_DEGREE = 30
+MAX_HUMIDITY = 60
 
 class Environmental_data:
     def __init__(self, id : int, timestamp : str, lux : int, voc : int, degree : int, humidity : int, room_id : int):
@@ -45,20 +53,43 @@ class Environmental_data:
                 cursor = mydb.cursor()
 
                 val = (self.lux, self.voc, self.degree, self.humidity, self.room_id)
+                print("qui")
                 sql = ("""INSERT INTO environmental_data (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d)""" % val)
-                
                 cursor.execute(sql)
                 mydb.commit()
-
+                print("qui")
                 self.id = cursor.lastrowid
 
-                return 200
             except Exception as e:
                 print(e)
                 return 500
             finally:
                 if(mydb.is_connected()):
                     mydb.close()
+            
+            emergency_flag = False
+            if(self.lux < MIN_LUX):
+                emergency_flag = True
+            if(self.lux > MAX_LUX):
+                emergency_flag = True
+            if(self.voc > MAX_VOC):
+                emergency_flag = True
+            if(self.degree < MIN_DEGREE):
+                emergency_flag = True
+            if(self.degree > MAX_DEGREE):
+                emergency_flag = True
+            if(self.humidity < MAX_DEGREE):
+                emergency_flag = True
+
+            if(emergency_flag):
+                emergency_obj = Emergency(None, None, None, None, None, None, None, None)
+                print(self.id)
+                data = {"level_em" : 0, "type_em" : 0, "env_data_id" : self.id}
+                value = emergency_obj.add_emergency(data)
+                if(value != 200):
+                    return 500
+            
+            return 200
         else:
             return 400
 
