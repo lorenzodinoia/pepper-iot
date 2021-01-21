@@ -56,6 +56,8 @@ class Emergency:
                         self.env_data_id = data["env_data_id"]
                         val = (self.level_em, self.type_em, self.env_data_id)
                         sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, env_data_id) VALUES (NOW(), %d, %d, False, %d)""" % val)
+                        cursor.execute(sql)
+                        mydb.commit()
                     else: 
                         return 400
                 elif (self.type_em == 1):
@@ -63,6 +65,8 @@ class Emergency:
                         self.vital_signs_id = data["vital_signs_id"]
                         val = (self.level_em, self.type_em, self.vital_signs_id)
                         sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id) VALUES (NOW(), %d, %d, False, %d)""" % val)
+                        cursor.execute(sql)
+                        mydb.commit()
                     else:
                         return 400
 
@@ -81,7 +85,7 @@ class Emergency:
 
                         #Get the list of emergencies not handeld that refers to the inmate of bed get previously
                         val = join[0]["inmate_id"]
-                        sql = ("""SELECT * FROM emergency INNER JOIN vital_signs ON emergency.vital_signs_id = vital_signs.id WHERE inmate_id = %d AND done = False""" % val)
+                        sql = ("""SELECT vital_signs.*, emergency.id, emergency.tmstp AS tmstp_em, emergency.level_em, emergency.type_em, emergency.done FROM emergency INNER JOIN vital_signs ON emergency.vital_signs_id = vital_signs.id WHERE inmate_id = %d AND done = False""" % val)
                         cursor.execute(sql)
                         columns = [column[0] for column in cursor.description]
                         list = []
@@ -91,25 +95,20 @@ class Emergency:
                         #Check if there is another emergency for the same inmate that has a timestamp difference below 1 min.
                         valid = True
                         now = datetime.now()
-                        print("qui")
                         for vital_sign in list:
-                            difference = now - vital_sign["tmstp"]
-                            print(difference)
+                            difference = now - vital_sign["tmstp_em"]
                             if(difference.seconds < 60) : 
                                 valid = False
 
                         if(valid):
                             val = (self.level_em, self.type_em, self.bed_id)
                             sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, bed_id) VALUES (NOW(), %d, %d, False, %d)""" % val)
+                            cursor.execute(sql)
+                            mydb.commit()
                     else:
                         return 400    
                 else:
                     return 400
-            
-                cursor.execute(sql)
-                mydb.commit()
-
-                self.id = cursor.lastrowid
 
                 return 200
             except Exception as e:

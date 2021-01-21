@@ -53,11 +53,9 @@ class Environmental_data:
                 cursor = mydb.cursor()
 
                 val = (self.lux, self.voc, self.degree, self.humidity, self.room_id)
-                print("qui")
                 sql = ("""INSERT INTO environmental_data (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d)""" % val)
                 cursor.execute(sql)
                 mydb.commit()
-                print("qui")
                 self.id = cursor.lastrowid
 
             except Exception as e:
