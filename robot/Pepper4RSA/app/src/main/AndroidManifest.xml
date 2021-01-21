@@ -5,6 +5,7 @@
     <uses-feature android:name="com.softbank.hardware.pepper" />
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Pepper4RSA">
-        <activity android:name=".ExplorationActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.Pepper4RSA">

@@ -1,6 +1,5 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 29
@@ -36,4 +35,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 	implementation 'com.aldebaran:qisdk:1.7.5'
 	implementation 'com.aldebaran:qisdk-design:1.7.5'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.github.softbankrobotics-labs:pepper-extras:1.1.1'
 }
