@@ -14,7 +14,7 @@ MAX_DEGREE = 30
 MAX_HUMIDITY = 60
 
 class Environmental_data:
-    def __init__(self, id : int, timestamp : str, lux : int, voc : int, degree : int, humidity : int, room_id : int):
+    def __init__(self, id : int, timestamp : str, lux : int, voc : float, degree : float, humidity : int, room_id : int):
         self.id = id
         self.timestamp = timestamp
         self.lux = lux
