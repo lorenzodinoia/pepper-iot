@@ -67,13 +67,15 @@ class Environmental_data:
             
             emergency_flag = False
             if(self.lux < MIN_LUX):
-                emergency_flag = True
+                if(self.lux > 0):
+                    emergency_flag = True
             if(self.lux > MAX_LUX):
                 emergency_flag = True
             if(self.voc > MAX_VOC):
                 emergency_flag = True
             if(self.degree < MIN_DEGREE):
-                emergency_flag = True
+                if(self.degree > 0):
+                    emergency_flag = True
             if(self.degree > MAX_DEGREE):
                 emergency_flag = True
             if(self.humidity < MAX_DEGREE):
@@ -81,7 +83,6 @@ class Environmental_data:
 
             if(emergency_flag):
                 emergency_obj = Emergency(None, None, None, None, None, None, None, None)
-                print(self.id)
                 data = {"level_em" : 0, "type_em" : 0, "env_data_id" : self.id}
                 value = emergency_obj.add_emergency(data)
                 if(value != 200):

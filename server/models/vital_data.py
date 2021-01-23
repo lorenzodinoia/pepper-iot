@@ -1,20 +1,21 @@
 import os
+from re import T
 import mysql.connector
 from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flask import abort
+from models.emergency import Emergency
 
-"""
+
 MIN_BPM = 60
 MAX_BPM = 100
 MIN_BODY_TEMPERATURE = 35
 MAX_BODY_TEMPERATURE = 37.5
-MIN_BODY_PRESSURE = 
-MAX_BODY_PRESSURE =
-MIN_BLOOD_OXYGENATION = 
-MAX_BLOOD_OXYGENATION = 
-"""
+MAX_MIN_BODY_PRESSURE = 80
+MAX_MAX_BODY_PRESSURE = 120
+MIN_BLOOD_OXYGENATION = 95
+
 
 class Vital_data:
     def __init__(self, id : int, tmstp : str, bpm : int, body_temperature : float, min_body_pressure : int, max_body_pressure : int, blood_oxygenation : int, inmate_id : int):
@@ -30,9 +31,11 @@ class Vital_data:
     def add_data(self, data):
         if(data is not None):
             self.bpm = 0
+            print(self.bpm)
             self.body_temperature = 0
             self.min_body_pressure = 0
             self.max_body_pressure = 0
+            self.blood_oxygenation = 0
             self.inmate_id = None
             if("bpm" in data):
                 self.bpm = data["bpm"]
@@ -66,14 +69,44 @@ class Vital_data:
 
             self.id = cursor.lastrowid
                 
-            return 200
-        except:
+        except Exception as e:
+            print(e)
             return 500
         finally:
             if(mydb.is_connected()):
                 mydb.close()
             else:
                 return 400
+        
+        emergency_flag = False
+        if(self.bpm < MIN_BPM):
+            if(self.bpm > 0):
+                emergency_flag = True
+        if(self.bpm > MAX_BPM):
+            emergency_flag = True
+        if(self.body_temperature < MIN_BODY_TEMPERATURE):
+            if(self.body_temperature > 0):
+                emergency_flag = True
+        if(self.body_temperature > MAX_BODY_TEMPERATURE):
+            emergency_flag = True
+        if(self.min_body_pressure > MAX_MIN_BODY_PRESSURE):
+            emergency_flag = True
+        if(self.max_body_pressure > MAX_MAX_BODY_PRESSURE):
+            emergency_flag = True
+        if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
+            if(self.blood_oxygenation > 0):
+                emergency_flag = True
+        
+        #TODO testare
+        
+        if(emergency_flag):
+            emergency_obj = Emergency(None, None, None, None, None, None, None, None)
+            data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id}
+            value = emergency_obj.add_emergency(data)
+            if(value != 200):
+                return 500
+
+        return 200
     
     def get_latest_data(self):
         mydb = None
