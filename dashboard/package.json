@@ -20,8 +20,11 @@
     "@angular/platform-browser-dynamic": "~11.0.6",
     "@angular/router": "~11.0.6",
     "bootstrap": "^4.5.3",
+    "echarts": "^5.0.1",
     "jquery": "^3.5.1",
+    "ngx-echarts": "^6.0.0",
     "popper.js": "^1.16.1",
+    "resize-observer-polyfill": "^1.5.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"
