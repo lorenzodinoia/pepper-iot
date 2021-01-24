@@ -15,6 +15,11 @@ import { RoomTemperatureChartComponent } from './room-temperature-chart/room-tem
 import { RoomHumidityChartComponent } from './room-humidity-chart/room-humidity-chart.component';
 import { RoomLuxChartComponent } from './room-lux-chart/room-lux-chart.component';
 import { RoomVocChartComponent } from './room-voc-chart/room-voc-chart.component';
+import { InmateComponent } from './inmate/inmate.component';
+import { InmateTemperatureChartComponent } from './inmate-temperature-chart/inmate-temperature-chart.component';
+import { InmateOxygenationChartComponent } from './inmate-oxygenation-chart/inmate-oxygenation-chart.component';
+import { InmateBpmChartComponent } from './inmate-bpm-chart/inmate-bpm-chart.component';
+import { InmatePressureChartComponent } from './inmate-pressure-chart/inmate-pressure-chart.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +33,12 @@ import { RoomVocChartComponent } from './room-voc-chart/room-voc-chart.component
     RoomTemperatureChartComponent,
     RoomHumidityChartComponent,
     RoomLuxChartComponent,
-    RoomVocChartComponent
+    RoomVocChartComponent,
+    InmateComponent,
+    InmateTemperatureChartComponent,
+    InmateOxygenationChartComponent,
+    InmateBpmChartComponent,
+    InmatePressureChartComponent
   ],
   imports: [
     BrowserModule,

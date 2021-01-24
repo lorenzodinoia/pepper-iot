@@ -1,6 +1,8 @@
 <div class="row">
     <div class="col col-lg-3 card">
-        <h5 class="card-title">{{inmate.name}} {{inmate.surname}}</h5>
+        <a [routerLink]="['/inmate', inmate.id]">
+            <h5 class="card-title">{{inmate.name}} {{inmate.surname}}</h5>
+        </a>
         <p class="text-secondary">{{inmate.cf}}</p>
     </div>
     <div class="col card">
