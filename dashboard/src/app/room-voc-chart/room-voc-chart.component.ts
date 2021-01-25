@@ -18,6 +18,19 @@ export class RoomVocChartComponent implements OnInit {
       tooltip: {
         show: true
       },
+      dataZoom: [
+      {
+          id: 'dataZoomX',
+          type: 'slider',
+          xAxisIndex: [0],
+          filterMode: 'filter'
+      },
+      {
+          id: 'dataZoomY',
+          type: 'slider',
+          yAxisIndex: [0],
+          filterMode: 'empty'
+      }],
       xAxis: {
         data: hours,
         silent: false,

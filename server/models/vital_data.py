@@ -136,6 +136,37 @@ class Vital_data:
             if mydb.is_connected():
                 mydb.close()
 
+    def get_series(self, field: str):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+            cursor.execute("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.inmate_id))
+            columns = [column[0] for column in cursor.description]
+            data = []
+            for row in cursor.fetchall():
+                data.append(dict(zip(columns, row)))
+
+            series = []
+            for element in data:
+                tmstp = element["tmstp"]
+                hour = ("%s:%s" % (tmstp.hour, tmstp.minute))
+                series.append({"hour": hour, "value": element[field]})
+
+            return series
+        except:
+            return 500
+        finally:
+            if mydb.is_connected():
+                mydb.close()
+
+
+
+
 vital_data_blueprint = Blueprint('vital_data', __name__)
 
 @vital_data_blueprint.route("/add", methods=["POST"]) #Add a new vital data
@@ -158,5 +189,19 @@ def get_latest():
             return jsonify(value)
         else:
             return abort(400)
+    else:
+        return abort(400)
+
+@vital_data_blueprint.route("/series/", methods=["GET"])
+def get():
+    inmate_id = request.args.get("inmate_id", default=None, type=int)
+    field = request.args.get("field", default=None, type=str)
+    if (inmate_id is not None) and (field is not None):
+        obj = Vital_data(None, None, None, None, None, None, None, inmate_id)
+        value = obj.get_series(field)
+        if(value != 500):
+            return jsonify({"values" : value})
+        else:
+            return abort(value)
     else:
         return abort(400)

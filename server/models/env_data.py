@@ -120,6 +120,33 @@ class Environmental_data:
             if mydb.is_connected():
                 mydb.close()
 
+    def get_series(self, field: str):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+            cursor.execute("""SELECT %s, tmstp FROM pepperiot.environmental_data WHERE room_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.room_id))
+            columns = [column[0] for column in cursor.description]
+            data = []
+            for row in cursor.fetchall():
+                data.append(dict(zip(columns, row)))
+
+            series = []
+            for element in data:
+                tmstp = element["tmstp"]
+                hour = ("%s:%s" % (tmstp.hour, tmstp.minute))
+                series.append({"hour": hour, "value": element[field]})
+
+            return series
+        except:
+            return 500
+        finally:
+            if mydb.is_connected():
+                mydb.close()
 
 
 
@@ -143,3 +170,17 @@ def get_latest():
         return jsonify(value)
     else:
         return abort(value)
+
+@env_data_blueprint.route("/series/", methods=["GET"])
+def get():
+    room_id = request.args.get("room_id", default=None, type=int)
+    field = request.args.get("field", default=None, type=str)
+    if (room_id is not None) and (field is not None):
+        obj = Environmental_data(None, None, None, None, None, None, room_id)
+        value = obj.get_series(field)
+        if(value != 500):
+            return jsonify({"values" : value})
+        else:
+            return abort(value)
+    else:
+        return abort(400)

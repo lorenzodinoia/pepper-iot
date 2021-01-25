@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { Client } from '../client';
 
 @Component({
   selector: 'inmate-temperature-chart',
@@ -6,18 +8,47 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./inmate-temperature-chart.component.scss']
 })
 export class InmateTemperatureChartComponent implements OnInit {
+  @Input()
+  public id!: number;
   public chartOptions: any;
+  
 
-  constructor() { }
+  constructor(private _client: Client) { }
 
   ngOnInit(): void {
-    let hours: Array<string> = ["20:00", "20:10", "20:20", "20:30", "20:40", "20:50", "21:00", "21:10", "21:20", "21:30", "21:40", "21:50", "22:00", "22:10"]
-    let temperatures: Array<number> = [35.5, 35.5, 35.6, 35.4, 35.5, 35.6, 35.6, 35.6, 35.9, 36, 36.1, 36.3, 36, 35.9]
+    this._client.httpClient.get(`${Client.SERVER_URL}/vital_signs/series/?inmate_id=${this.id}&field=body_temperature`, Client.OPTIONS).pipe(map((response: any) => {
+      return response;
+    })).subscribe((response) => {
+      let hours: Array<string> = [];
+      let values: Array<number> = [];
+      let valuesJson: any = response["values"];
+      for(let index in valuesJson) {
+        let item: any = valuesJson[index];
+        hours.push(item["hour"]);
+        values.push(item["value"]);
+      }
+      this.setData(hours, values);
+    });    
+  }
 
+  private setData(hours: Array<string>, values: Array<number>): void {
     this.chartOptions = {
       tooltip: {
         show: true
       },
+      dataZoom: [
+      {
+          id: 'dataZoomX',
+          type: 'slider',
+          xAxisIndex: [0],
+          filterMode: 'filter'
+      },
+      {
+          id: 'dataZoomY',
+          type: 'slider',
+          yAxisIndex: [0],
+          filterMode: 'empty'
+      }],
       xAxis: {
         data: hours,
         silent: false,
@@ -33,7 +64,7 @@ export class InmateTemperatureChartComponent implements OnInit {
         {
           name: 'Temperatura',
           type: 'line',
-          data: temperatures,
+          data: values,
           itemStyle: {color: "green"},
           lineStyle: {color: "green"}
         }

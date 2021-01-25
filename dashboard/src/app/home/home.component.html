@@ -2,8 +2,8 @@
 <html>
     <body>
         <div class="container-fluid">
-            <div class="row">
-                <div class="col" *ngFor="let room of rooms">
+            <div class="row justify-content-center">
+                <div class="col-sm-3" style="min-width: 20rem;" *ngFor="let room of rooms">
                     <room-card [room]="room"></room-card>
                 </div>
             </div>
