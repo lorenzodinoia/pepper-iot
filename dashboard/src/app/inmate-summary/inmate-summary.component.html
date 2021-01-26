@@ -1,41 +1,45 @@
-<div class="row">
-    <div class="col col-lg-3 card">
-        <a [routerLink]="['/inmate', inmate.id]">
-            <h5 class="card-title">{{inmate.name}} {{inmate.surname}}</h5>
-        </a>
-        <p class="text-secondary">{{inmate.cf}}</p>
+<div class="row row justify-content-center" style="padding: 1rem;">
+    <div class="col-sm-3">
+        <div class="card" style="padding: 1rem; min-width: 20rem; max-width: 30rem;">
+            <a [routerLink]="['/inmate', inmate.id]">
+                <h5 class="card-title">{{inmate.name}} {{inmate.surname}}</h5>
+            </a>
+            <p class="text-secondary">{{inmate.cf}}</p>
+        </div>
     </div>
-    <div class="col card">
-        <div class="row">
-            <div class="col">
-                <div class="card" style="width: 12rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">Ossigenazione</h5>
-                        <h4>{{inmate.vitalSigns.bloodOxygenation}} %</h4>
+    <div class="col-auto">
+        <div class="card">
+            <div class="row">
+                <div class="col">
+                    <div class="card vital-sign-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Ossigenazione</h5>
+                            <h4>{{inmate.vitalSigns.bloodOxygenation}} %</h4>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card" style="width: 12rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">Pressione</h5>
-                        <h4>{{inmate.vitalSigns.bloodMinPressure}}/{{inmate.vitalSigns.bloodMaxPressure}} mmHg</h4>
+                <div class="col">
+                    <div class="card vital-sign-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Pressione</h5>
+                            <h4>{{inmate.vitalSigns.bloodMinPressure}}/{{inmate.vitalSigns.bloodMaxPressure}} mmHg</h4>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card" style="width: 12rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">Temperatura</h5>
-                        <h4>{{inmate.vitalSigns.bodyTemperature}} C°</h4>
+                <div class="col">
+                    <div class="card vital-sign-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Temperatura</h5>
+                            <h4>{{inmate.vitalSigns.bodyTemperature}} C°</h4>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <div class="card" style="width: 12rem;">
-                    <div class="card-body">
-                        <h5 class="card-title">Battito cardiaco</h5>
-                        <h4>{{inmate.vitalSigns.bpm}} BPM</h4>
+                <div class="col">
+                    <div class="card vital-sign-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Battito cardiaco</h5>
+                            <h4>{{inmate.vitalSigns.bpm}} BPM</h4>
+                        </div>
                     </div>
                 </div>
             </div>

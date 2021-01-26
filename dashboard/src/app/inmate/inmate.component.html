@@ -6,10 +6,10 @@
             <p>{{inmate.birthDate}}</p>
         </div>
         <div class="col card">
-            <inmate-temperature-chart></inmate-temperature-chart>
-            <inmate-bpm-chart></inmate-bpm-chart>
-            <inmate-oxygenation-chart></inmate-oxygenation-chart>
-            <inmate-pressure-chart></inmate-pressure-chart>
+            <inmate-temperature-chart [id]="inmate.id"></inmate-temperature-chart>
+            <inmate-bpm-chart [id]="inmate.id"></inmate-bpm-chart>
+            <inmate-oxygenation-chart [id]="inmate.id"></inmate-oxygenation-chart>
+            <inmate-pressure-chart [id]="inmate.id"></inmate-pressure-chart>
         </div>
     </div>
 </div>
