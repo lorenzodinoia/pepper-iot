@@ -14,7 +14,7 @@ MAX_DEGREE = 30
 MAX_HUMIDITY = 60
 
 class Environmental_data:
-    def __init__(self, id : int, timestamp : str, lux : int, voc : int, degree : int, humidity : int, room_id : int):
+    def __init__(self, id : int, timestamp : str, lux : int, voc : float, degree : float, humidity : int, room_id : int):
         self.id = id
         self.timestamp = timestamp
         self.lux = lux
@@ -53,11 +53,9 @@ class Environmental_data:
                 cursor = mydb.cursor()
 
                 val = (self.lux, self.voc, self.degree, self.humidity, self.room_id)
-                print("qui")
                 sql = ("""INSERT INTO environmental_data (tmstp, lux, voc, degree, humidity, room_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d)""" % val)
                 cursor.execute(sql)
                 mydb.commit()
-                print("qui")
                 self.id = cursor.lastrowid
 
             except Exception as e:
@@ -69,13 +67,15 @@ class Environmental_data:
             
             emergency_flag = False
             if(self.lux < MIN_LUX):
-                emergency_flag = True
+                if(self.lux > 0):
+                    emergency_flag = True
             if(self.lux > MAX_LUX):
                 emergency_flag = True
             if(self.voc > MAX_VOC):
                 emergency_flag = True
             if(self.degree < MIN_DEGREE):
-                emergency_flag = True
+                if(self.degree > 0):
+                    emergency_flag = True
             if(self.degree > MAX_DEGREE):
                 emergency_flag = True
             if(self.humidity < MAX_DEGREE):
@@ -83,7 +83,6 @@ class Environmental_data:
 
             if(emergency_flag):
                 emergency_obj = Emergency(None, None, None, None, None, None, None, None)
-                print(self.id)
                 data = {"level_em" : 0, "type_em" : 0, "env_data_id" : self.id}
                 value = emergency_obj.add_emergency(data)
                 if(value != 200):
@@ -121,6 +120,33 @@ class Environmental_data:
             if mydb.is_connected():
                 mydb.close()
 
+    def get_series(self, field: str):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+            cursor.execute("""SELECT %s, tmstp FROM pepperiot.environmental_data WHERE room_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.room_id))
+            columns = [column[0] for column in cursor.description]
+            data = []
+            for row in cursor.fetchall():
+                data.append(dict(zip(columns, row)))
+
+            series = []
+            for element in data:
+                tmstp = element["tmstp"]
+                hour = ("%s:%s" % (tmstp.hour, tmstp.minute))
+                series.append({"hour": hour, "value": element[field]})
+
+            return series
+        except:
+            return 500
+        finally:
+            if mydb.is_connected():
+                mydb.close()
 
 
 
@@ -144,3 +170,17 @@ def get_latest():
         return jsonify(value)
     else:
         return abort(value)
+
+@env_data_blueprint.route("/series/", methods=["GET"])
+def get():
+    room_id = request.args.get("room_id", default=None, type=int)
+    field = request.args.get("field", default=None, type=str)
+    if (room_id is not None) and (field is not None):
+        obj = Environmental_data(None, None, None, None, None, None, room_id)
+        value = obj.get_series(field)
+        if(value != 500):
+            return jsonify({"values" : value})
+        else:
+            return abort(value)
+    else:
+        return abort(400)

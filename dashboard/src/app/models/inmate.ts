@@ -1,3 +1,6 @@
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { Client } from "../client";
 import { Model } from "./model";
 import { VitalSigns } from "./vitalSigns";
 
@@ -54,5 +57,11 @@ export class Inmate extends Model {
             inmate.vitalSigns = VitalSigns.fromJSON(json.vital_signs);
         }
         return inmate;
+    }
+
+    public static getDetails(client: Client, id: number): Observable<Inmate> {
+        return client.httpClient.get(`${Client.SERVER_URL}/inmate/?id=${id}`, Client.OPTIONS).pipe(map((response: any) => {
+            return Inmate.fromJSON(response);
+          }));
     }
 }

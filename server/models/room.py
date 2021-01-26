@@ -52,7 +52,14 @@ class Room:
             for row in cursor.fetchall():
                 room_list.append(dict(zip(room_columns, row)))
 
-            return room_list
+            rooms = []
+            for room in room_list:
+                room_id = room['id']
+                room_name = room['name_room']
+                new_room = {'id': room_id, 'name': room_name}
+                rooms.append(new_room)
+
+            return rooms
         except Exception:
             return 500
         finally:

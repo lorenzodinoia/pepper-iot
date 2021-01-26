@@ -30,7 +30,7 @@ def change_settings():
     response = requests.get(server_host)
 
     if response.status_code == 200:
-        rooms = requests.get(server_host + ENPOINT_ROOM + "/all")
+        rooms = requests.get(server_host + ENPOINT_ROOM + "/list")
         if rooms is not None:
             try:
                 rooms_json = rooms.json()
@@ -41,12 +41,12 @@ def change_settings():
             if len(rooms_json) > 0:
                 count = 1
                 for room in rooms_json:
-                    print("%d) %s" % (count, room["name_room"]))
+                    print("%d) %s" % (count, room["name"]))
                     count += 1
                 chosen_room = int(input("Choose a room by its number: "))
                 try:
                     room = rooms_json[chosen_room - 1]
-                    save_settings(server_host, room["id"], room["name_room"])
+                    save_settings(server_host, room["id"], room["name"])
                     print("\n*SETUP COMPLETED*")
                 except IndexError:
                     print("ERROR: The room doesn't exits")

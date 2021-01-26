@@ -1,0 +1,15 @@
+<div class="container-fluid" *ngIf="inmate">
+    <div class="row">
+        <div class="col col-lg-4 card">
+            <h4>{{inmate.name}} {{inmate.surname}}</h4>
+            <p>{{inmate.cf}}</p>
+            <p>{{inmate.birthDate}}</p>
+        </div>
+        <div class="col card">
+            <inmate-temperature-chart [id]="inmate.id"></inmate-temperature-chart>
+            <inmate-bpm-chart [id]="inmate.id"></inmate-bpm-chart>
+            <inmate-oxygenation-chart [id]="inmate.id"></inmate-oxygenation-chart>
+            <inmate-pressure-chart [id]="inmate.id"></inmate-pressure-chart>
+        </div>
+    </div>
+</div>

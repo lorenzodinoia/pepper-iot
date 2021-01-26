@@ -15,7 +15,6 @@ import com.aldebaran.qi.sdk.design.activity.RobotActivity;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
-import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,13 +26,17 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.SaveFileHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.Vector2theta;
 import it.uniba.di.sysag.pepper4rsa.utils.provider.Providers;
 
-public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks {
-    private static final String CONSOLE_TAG = "Pepper4RSA";
+public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks, NavigationListener {
+    public static final String CONSOLE_TAG = "Pepper4RSA";
     private static final int PERMISSION_STORAGE = 1;
 
     private QiContext qiContext;
     private SaveFileHelper saveFileHelper;
     private RobotHelper robotHelper;
+
+    private TreeMap<String, AttachedFrame> savedLocations;
+
+    private NavigationFragment navigationFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +44,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         Providers.init(getApplicationContext());
         setContentView(R.layout.activity_main);
 
+        //Check android permission
         if (this.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             this.init();
         }
@@ -48,19 +52,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_STORAGE);
         }
 
-        MaterialButton buttonTest = findViewById(R.id.buttonTest);
-        buttonTest.setOnClickListener(v -> {
-            Runnable loadLocationsRunnable = () -> {
-                try {
-                    loadLocations();
-                }
-                catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            };
-            Thread loadLocationsThread = new Thread(loadLocationsRunnable);
-            loadLocationsThread.start();
-        });
     }
 
     @Override
@@ -73,6 +64,20 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     public void onRobotFocusGained(QiContext qiContext) {
         this.qiContext = qiContext;
         this.robotHelper.onRobotFocusGained(qiContext);
+
+        try {
+            loadLocations();
+            //TODO aggiungere logica di get delle emergenze
+            Bundle bundle = new Bundle();
+            bundle.putString(NavigationFragment.ARG_LABEL_FRAME, "Gioconda");
+            navigationFragment = new NavigationFragment();
+            navigationFragment.setArguments(bundle);
+            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -108,7 +113,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
             Map<String, Vector2theta> vectors = saveFileHelper.getLocationsFromFile("/sdcard/Maps", "points.json");
 
             // Clear current savedLocations.
-            TreeMap<String, AttachedFrame> savedLocations = new TreeMap<>();
+            savedLocations = new TreeMap<>();
             Frame mapFrame = robotHelper.getMapFrame();
 
             // Build frames from the vectors.
@@ -128,5 +133,37 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         else {
             throw new FileNotFoundException();
         }
+    }
+
+    public QiContext getQiContext() {
+        return qiContext;
+    }
+
+    public RobotHelper getRobotHelper() {
+        return robotHelper;
+    }
+
+    public TreeMap<String, AttachedFrame> getSavedLocations() {
+        return savedLocations;
+    }
+
+    @Override
+    public void onNavigationStarted() {
+
+    }
+
+    @Override
+    public void onNavigationFinished() {
+
+    }
+
+    @Override
+    public void onNavigationCancelled() {
+
+    }
+
+    @Override
+    public void onNavigationFailed() {
+
     }
 }

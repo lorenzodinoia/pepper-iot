@@ -5,4 +5,6 @@
     <string name="message_404">L\'elemento non è disponibile</string>
     <string name="message_500">C\'è un problema su server</string>
     <string name="message_generic_error">Si è verificato un problema</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
