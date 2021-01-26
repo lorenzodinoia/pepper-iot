@@ -20,6 +20,8 @@ import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.uniba.di.sysag.pepper4rsa.R;
+
 /***
  * <p>
  * This helper simplifies the use of the Localize and LocalizeAndMap actions.
@@ -255,7 +257,7 @@ public class LocalizeAndMapHelper {
     public Future<Void> animationToLookInFront() {
         Log.d(TAG, "animationToLookInFront: started");
         return AnimationBuilder.with(qiContext) // Create the builder with the context.
-                //.withResources(R.raw.idle) // Set the animation resource.
+                .withResources(R.raw.idle) // Set the animation resource.
                 .buildAsync().andThenCompose(animation -> AnimateBuilder.with(qiContext)
                         .withAnimation(animation)
                         .buildAsync().andThenCompose(animate -> animate.async().run()));

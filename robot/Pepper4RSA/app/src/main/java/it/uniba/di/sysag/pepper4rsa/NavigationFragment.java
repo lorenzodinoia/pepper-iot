@@ -10,23 +10,34 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.aldebaran.qi.sdk.QiContext;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
+import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
+import com.aldebaran.qi.sdk.util.FutureUtils;
+
+import java.util.concurrent.TimeUnit;
 
 import it.uniba.di.sysag.pepper4rsa.utils.map.GoToHelper;
+import it.uniba.di.sysag.pepper4rsa.utils.map.LocalizeAndMapHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 
 public class NavigationFragment extends Fragment{
 
+    public static final String CONSOLE_TAG = "Pepper4RSA";
     public static final String ARG_LABEL_FRAME = "labelFrame";
     private MainActivity mainActivity;
     private RobotHelper robotHelper;
     private QiContext qiContext;
 
     private AttachedFrame location;
-    private String locationLabel;
+    private String locationLabel = "Gioconda";
+
+    private Button buttonLocalize;
+    private Button buttonGioconda;
+    private Button buttonMapFrame;
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -35,18 +46,61 @@ public class NavigationFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState == null){
+        /*if(savedInstanceState == null){
             Bundle bundle = getArguments();
             if(bundle != null && bundle.containsKey(ARG_LABEL_FRAME)){
                 locationLabel = bundle.getString(ARG_LABEL_FRAME);
             }
-        }
+        }*/
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_navigation, container, false);
+
+        buttonLocalize = view.findViewById(R.id.buttonLocalization);
+        buttonGioconda = view.findViewById(R.id.buttonGioconda);
+        buttonMapFrame = view.findViewById(R.id.buttonMapFrame);
+
+        buttonLocalize.setOnClickListener(v -> {
+            mainActivity.startLocalizing();
+        });
+
+        buttonGioconda.setOnClickListener(v -> {
+            locationLabel = "Gioconda";
+            if (locationLabel != null) {
+                location = mainActivity.getSavedLocations().get(locationLabel);
+                if(location != null){
+                    goToLocation();
+                }
+            }
+        });
+
+        buttonMapFrame.setOnClickListener(v -> {
+            locationLabel = "mapFrame";
+            if (locationLabel != null) {
+                goToLocation();
+            }
+        });
+        RobotHelper robotHelper = mainActivity.getRobotHelper();
+        robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
+            //mainActivity.robotIsLocalized.set(result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED);
+            robotHelper.releaseAbilities();
+            mainActivity.runOnUiThread(() -> {
+                if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
+                    robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
+                    Log.d(CONSOLE_TAG, "Localized");
+                } else if (result == LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING) {
+                    robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
+                    Log.d(CONSOLE_TAG, "Map_Missing");
+                } else if (result == LocalizeAndMapHelper.LocalizationStatus.FAILED) {
+                    Log.d(CONSOLE_TAG, "Failed");
+                } else {
+                    Log.d(CONSOLE_TAG, "onViewCreated: Unable to localize in Map");
+                }
+            });
+        });
 
 
         return view;
@@ -55,12 +109,6 @@ public class NavigationFragment extends Fragment{
     @Override
     public void onStart() {
         super.onStart();
-        if (locationLabel != null) {
-            location = mainActivity.getSavedLocations().get(locationLabel);
-            if(location != null){
-                goToLocation();
-            }
-        }
     }
 
     @Override
@@ -105,6 +153,8 @@ public class NavigationFragment extends Fragment{
         });
     }
 
+
+
     /**
      * Send the robot to the desired position.
      */
@@ -113,7 +163,6 @@ public class NavigationFragment extends Fragment{
         robotHelper.say("Let's go to " + locationLabel + "!!");
         robotHelper.goToHelper.checkAndCancelCurrentGoto().thenConsume(aVoid -> {
             robotHelper.holdAbilities(true);
-            //TODO controllare orientation
             if (this.locationLabel.equalsIgnoreCase("mapFrame")) {
                 robotHelper.goToHelper.goToMapFrame(false, false, OrientationPolicy.FREE_ORIENTATION);
             }
@@ -122,4 +171,5 @@ public class NavigationFragment extends Fragment{
             }
         });
     }
+
 }
