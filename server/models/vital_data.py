@@ -29,9 +29,9 @@ class Vital_data:
         self.inmate_id = inmate_id
 
     def add_data(self, data):
+        print(data)
         if(data is not None):
             self.bpm = 0
-            print(self.bpm)
             self.body_temperature = 0
             self.min_body_pressure = 0
             self.max_body_pressure = 0
@@ -52,61 +52,60 @@ class Vital_data:
             else:
                 return 400
 
-        mydb = None
-        try:
-            mydb = mysql.connector.connect(
-                user = os.getenv("DATABASE_USER"),
-                database = os.getenv("DATABASE_NAME"),
-                password = os.getenv("DATABASE_PASSWORD")
-            )
-            cursor = mydb.cursor()
+            mydb = None
+            try:
+                mydb = mysql.connector.connect(
+                    user = os.getenv("DATABASE_USER"),
+                    database = os.getenv("DATABASE_NAME"),
+                    password = os.getenv("DATABASE_PASSWORD")
+                )
+                cursor = mydb.cursor()
 
-            val = (self.bpm, self.body_temperature, self.min_body_pressure, self.max_body_pressure, self.blood_oxygenation, self.inmate_id)
-            sql = ("""INSERT INTO vital_signs (tmstp, bpm, body_temperature, min_body_pressure, max_body_pressure, blood_oxygenation, inmate_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d, %d)""" % val)
-                
-            cursor.execute(sql)
-            mydb.commit()
+                val = (self.bpm, self.body_temperature, self.min_body_pressure, self.max_body_pressure, self.blood_oxygenation, self.inmate_id)
+                sql = ("""INSERT INTO vital_signs (tmstp, bpm, body_temperature, min_body_pressure, max_body_pressure, blood_oxygenation, inmate_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d, %d)""" % val)
+                cursor.execute(sql)
+                mydb.commit()
 
-            self.id = cursor.lastrowid
-                
-        except Exception as e:
-            print(e)
-            return 500
-        finally:
-            if(mydb.is_connected()):
-                mydb.close()
-            else:
-                return 400
-        
-        emergency_flag = False
-        if(self.bpm < MIN_BPM):
-            if(self.bpm > 0):
-                emergency_flag = True
-        if(self.bpm > MAX_BPM):
-            emergency_flag = True
-        if(self.body_temperature < MIN_BODY_TEMPERATURE):
-            if(self.body_temperature > 0):
-                emergency_flag = True
-        if(self.body_temperature > MAX_BODY_TEMPERATURE):
-            emergency_flag = True
-        if(self.min_body_pressure > MAX_MIN_BODY_PRESSURE):
-            emergency_flag = True
-        if(self.max_body_pressure > MAX_MAX_BODY_PRESSURE):
-            emergency_flag = True
-        if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
-            if(self.blood_oxygenation > 0):
-                emergency_flag = True
-        
-        #TODO testare
-        
-        if(emergency_flag):
-            emergency_obj = Emergency(None, None, None, None, None, None, None, None)
-            data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id}
-            value = emergency_obj.add_emergency(data)
-            if(value != 200):
+                self.id = cursor.lastrowid
+                    
+            except Exception as e:
+                print(e)
                 return 500
+            finally:
+                if(mydb.is_connected()):
+                    mydb.close()
+                else:
+                    return 400
+            
+            emergency_flag = False
+            if(self.bpm < MIN_BPM):
+                if(self.bpm > 0):
+                    emergency_flag = True
+            if(self.bpm > MAX_BPM):
+                emergency_flag = True
+            if(self.body_temperature < MIN_BODY_TEMPERATURE):
+                if(self.body_temperature > 0):
+                    emergency_flag = True
+            if(self.body_temperature > MAX_BODY_TEMPERATURE):
+                emergency_flag = True
+            if(self.min_body_pressure > MAX_MIN_BODY_PRESSURE):
+                emergency_flag = True
+            if(self.max_body_pressure > MAX_MAX_BODY_PRESSURE):
+                emergency_flag = True
+            if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
+                if(self.blood_oxygenation > 0):
+                    emergency_flag = True
+            
+            if(emergency_flag):
+                emergency_obj = Emergency(None, None, None, None, None, None, None, None)
+                data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id}
+                value = emergency_obj.add_emergency(data)
+                if(value != 200):
+                    return 500
 
-        return 200
+            return 200
+        else:
+            return 500
     
     def get_latest_data(self):
         mydb = None
@@ -142,13 +141,14 @@ vital_data_blueprint = Blueprint('vital_data', __name__)
 def add():
     data = request.json
     obj = Vital_data(None, None, None, None, None, None, None, None)
+    print(data)
     value = obj.add_data(data)
     if(value == 200):
         return jsonify({"message" : "ok"})
     else:
         return abort(value)
 
-@vital_data_blueprint.route("/")
+@vital_data_blueprint.route("/") #Get latest vital data
 def get_latest():
     inmate_id = request.args.get("inmate_id", default=None, type=int)
     if(inmate_id is not None):

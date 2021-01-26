@@ -67,6 +67,8 @@ class Bed:
             for row in cursor.fetchall():
                 data.append(dict(zip(columns, row)))
 
+            print(data)
+
             return data
         except Exception as e:
             print(e)
