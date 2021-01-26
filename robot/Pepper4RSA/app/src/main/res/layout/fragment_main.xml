@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <TextView
-            android:id="@+id/two_text"
+            android:id="@+id/textViewTitle"
             android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
-            android:id="@+id/button_start_localize"
+            android:id="@+id/buttonStartLocalize"
             android:layout_width="389dp"
             android:layout_height="362dp"
             android:layout_margin="10dp"
@@ -30,7 +30,7 @@
             android:background="@null"
             android:drawableTop="@drawable/ic_icn_localize_robot_burgermenu_notavailable"
             android:text="@string/localize"
-            android:textAllCaps="false"
+            android:textAllCaps="true"
             android:textSize="25sp"
             android:fontFamily="@font/verdanab"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -40,7 +40,7 @@
             app:layout_constraintVertical_bias="0.557" />
 
         <Button
-            android:id="@+id/goToFrame"
+            android:id="@+id/buttonStartService"
             android:layout_width="389dp"
             android:layout_height="362dp"
             android:layout_margin="10dp"
@@ -52,10 +52,10 @@
             android:textAllCaps="true"
             android:textSize="25sp"
             android:fontFamily="@font/verdanab"
-            app:layout_constraintBottom_toBottomOf="@+id/button_start_localize"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonStartLocalize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/separator"
-            app:layout_constraintTop_toTopOf="@+id/button_start_localize" />
+            app:layout_constraintTop_toTopOf="@+id/buttonStartLocalize" />
 
         <ImageView
             android:id="@+id/separator"
@@ -68,23 +68,11 @@
             android:textAllCaps="false"
             android:textSize="30sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/button_start_localize"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonStartLocalize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.489"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/button_start_localize"
+            app:layout_constraintTop_toTopOf="@+id/buttonStartLocalize"
             app:layout_constraintVertical_bias="0.472" />
-
-        <Button
-            android:id="@+id/back_button"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/ic_btn_back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

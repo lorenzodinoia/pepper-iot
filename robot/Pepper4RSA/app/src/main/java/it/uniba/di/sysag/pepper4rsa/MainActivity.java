@@ -19,14 +19,22 @@ import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import it.uniba.di.sysag.pepper4rsa.utils.map.LocalizeAndMapHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.SaveFileHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.Vector2theta;
+import it.uniba.di.sysag.pepper4rsa.utils.models.Room;
 import it.uniba.di.sysag.pepper4rsa.utils.provider.Providers;
+import it.uniba.di.sysag.pepper4rsa.utils.request.RoomRequest;
+import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
+import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
 
 public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks, NavigationListener {
     public static final String CONSOLE_TAG = "Pepper4RSA";
@@ -77,8 +85,23 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
             navigationFragment = new NavigationFragment();
             navigationFragment.setArguments(bundle);
             this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();*/
-            MainFragment mainFragment = new MainFragment();
-            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();
+            /*MainFragment mainFragment = new MainFragment();
+            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();*/
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> {
+                RoomRequest roomRequest = new RoomRequest();
+                roomRequest.readAll(new RequestListener<Collection<Room>>() {
+                    @Override
+                    public void successResponse(Collection<Room> response) {
+                        Log.d(MainActivity.CONSOLE_TAG, "Success");
+                    }
+
+                    @Override
+                    public void errorResponse(RequestException error) {
+                        Log.d(MainActivity.CONSOLE_TAG, "Error");
+                    }
+                });
+            }, 0, 2, TimeUnit.MINUTES);
 
         }
         catch (FileNotFoundException e) {
@@ -204,4 +227,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     public boolean isLocalized(){
         return localized;
     }
+
+    public void setLocalized(boolean localized) { this.localized = localized;}
 }

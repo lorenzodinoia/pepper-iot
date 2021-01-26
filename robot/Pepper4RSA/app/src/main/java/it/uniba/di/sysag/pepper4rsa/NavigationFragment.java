@@ -26,7 +26,6 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 
 public class NavigationFragment extends Fragment{
 
-    public static final String CONSOLE_TAG = "Pepper4RSA";
     public static final String ARG_LABEL_FRAME = "labelFrame";
     private MainActivity mainActivity;
     private RobotHelper robotHelper;
@@ -46,12 +45,6 @@ public class NavigationFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*if(savedInstanceState == null){
-            Bundle bundle = getArguments();
-            if(bundle != null && bundle.containsKey(ARG_LABEL_FRAME)){
-                locationLabel = bundle.getString(ARG_LABEL_FRAME);
-            }
-        }*/
     }
 
     @Override
@@ -59,6 +52,7 @@ public class NavigationFragment extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_navigation, container, false);
 
+        /**
         buttonLocalize = view.findViewById(R.id.buttonLocalization);
         buttonGioconda = view.findViewById(R.id.buttonGioconda);
         buttonMapFrame = view.findViewById(R.id.buttonMapFrame);
@@ -83,24 +77,7 @@ public class NavigationFragment extends Fragment{
                 goToLocation();
             }
         });
-        RobotHelper robotHelper = mainActivity.getRobotHelper();
-        robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
-            //mainActivity.robotIsLocalized.set(result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED);
-            robotHelper.releaseAbilities();
-            mainActivity.runOnUiThread(() -> {
-                if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
-                    robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
-                    Log.d(CONSOLE_TAG, "Localized");
-                } else if (result == LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING) {
-                    robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
-                    Log.d(CONSOLE_TAG, "Map_Missing");
-                } else if (result == LocalizeAndMapHelper.LocalizationStatus.FAILED) {
-                    Log.d(CONSOLE_TAG, "Failed");
-                } else {
-                    Log.d(CONSOLE_TAG, "onViewCreated: Unable to localize in Map");
-                }
-            });
-        });
+        **/
 
 
         return view;
