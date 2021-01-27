@@ -194,7 +194,64 @@ class Emergency:
             if mydb.is_connected():
                 mydb.close()
 
+    def get_next(self):
+        mydb = None
+        try:
+            mydb = mysql.connector.connect(
+                user = os.getenv("DATABASE_USER"),
+                database = os.getenv("DATABASE_NAME"),
+                password = os.getenv("DATABASE_PASSWORD")
+            )
+            cursor = mydb.cursor()
+            sql = """SELECT * FROM pepperiot.emergency WHERE done = 0 ORDER BY tmstp ASC LIMIT 1;""" #Get latest emergency
+            cursor.execute(sql)
 
+            emergency_columns = [column[0] for column in cursor.description]
+            emergency_list = []
+            for row in cursor.fetchall():
+                emergency_list.append(dict(zip(emergency_columns, row)))
+
+            emergency_id = emergency_list[0]["id"]
+            emergency_type = emergency_list[0]["type_em"]
+            emergency = {"id": emergency_id, "type": emergency_type, "level": emergency_list[0]["level_em"], "tmstp": emergency_list[0]["tmstp"]}
+
+            if emergency_type == 0: #Environmental emergency
+                sql = ("""SELECT environmental_data.*, room.* FROM emergency INNER JOIN environmental_data ON environmental_data.id = emergency.env_data_id INNER JOIN room ON room.id = environmental_data.room_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
+                cursor.execute(sql)
+                
+                join_columns = [column[0] for column in cursor.description]
+                join_list = []
+                for row in cursor.fetchall():
+                    join_list.append(dict(zip(join_columns, row)))
+
+                emergency_room_name = join_list[0]["name_room"]
+                env_data = {"lux": join_list[0]["lux"], "voc": join_list[0]["voc"], "temperature": join_list[0]["degree"], "humidity": join_list[0]["humidity"]}
+                emergency["env_data"] = env_data
+                emergency["room_name"] = emergency_room_name
+                return emergency
+            if emergency_type == 1: #Vital emergency
+                sql = ("""SELECT emergency.bed_id, vital_signs.* FROM emergency INNER JOIN vital_signs ON vital_signs.id = emergency.vital_signs_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
+                cursor.execute(sql)
+                
+                join_columns = [column[0] for column in cursor.description]
+                join_list = []
+                for row in cursor.fetchall():
+                    join_list.append(dict(zip(join_columns, row)))
+                
+                emergency_room_name = emergency_list[0]["bed_id"]
+                env_data = {"bpm": join_list[0]["bpm"], "body_temperature": join_list[0]["body_temperature"], "min_body_pressure": join_list[0]["min_body_pressure"], 
+                            "max_body_pressure": join_list[0]["max_body_pressure"], "blood_oxygenation": join_list[0]["blood_oxygenation"]}
+                emergency["vital_signs"] = env_data
+                emergency["bed_id"] = emergency_room_name
+                return emergency
+            if emergency_type == 2: #Button pressed
+                pass
+        except Exception as e:
+            print(e)
+            return 500
+        finally:
+            if(mydb.is_connected()):
+                mydb.close()
 
 
 emergency_blueprint = Blueprint('emergency', __name__)
@@ -230,3 +287,12 @@ def set_done():
             return abort(value)
     else:
         return abort(400)
+
+@emergency_blueprint.route("/next", methods=["GET"]) #Get latest emergency
+def get_latest():
+    emergency = Emergency(None, None, None, None, None, None, None, None)
+    value = emergency.get_next()
+    if(value != 500):
+        return jsonify(value)
+    else:
+        return abort(value)
