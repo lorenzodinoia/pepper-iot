@@ -1,1 +1,7 @@
-<div echarts [options]="chartOptions" class="room-chart"></div>
+<div class="card" style="width: auto;">
+    <div class="card-body">
+        <h5>Qualità dell'aria</h5>
+        <h4>{{latest}} mg/m<sup>3</sup></h4>   
+        <div echarts [options]="chartOptions" class="room-chart"></div>
+    </div>
+</div>

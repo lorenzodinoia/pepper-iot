@@ -20,6 +20,7 @@ import { InmateTemperatureChartComponent } from './inmate-temperature-chart/inma
 import { InmateOxygenationChartComponent } from './inmate-oxygenation-chart/inmate-oxygenation-chart.component';
 import { InmateBpmChartComponent } from './inmate-bpm-chart/inmate-bpm-chart.component';
 import { InmatePressureChartComponent } from './inmate-pressure-chart/inmate-pressure-chart.component';
+import { DatePipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -48,7 +49,7 @@ import { InmatePressureChartComponent } from './inmate-pressure-chart/inmate-pre
       echarts: () => import('echarts')
     }),
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

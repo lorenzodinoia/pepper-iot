@@ -7,12 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RoomVocChartComponent implements OnInit {
   public chartOptions: any;
+  public latest!: number;
 
   constructor() { }
 
   ngOnInit(): void {
     let hours: Array<string> = ["20:00", "20:10", "20:20", "20:30", "20:40", "20:50", "21:00", "21:10", "21:20", "21:30", "21:40", "21:50", "22:00", "22:10"]
     let voc: Array<number> = [0.5, 0.6, 0.5, 0.7, 1, 0.8, 0.8, 0.5, 0.5, 0.6, 0.7, 0.6, 0.7, 0.7]
+    this.latest = voc[voc.length - 1];
 
     this.chartOptions = {
       tooltip: {
