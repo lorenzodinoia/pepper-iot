@@ -211,6 +211,9 @@ class Emergency:
             for row in cursor.fetchall():
                 emergency_list.append(dict(zip(emergency_columns, row)))
 
+            if len(emergency_list) == 0:
+                return {}
+
             emergency_id = emergency_list[0]["id"]
             emergency_type = emergency_list[0]["type_em"]
             emergency = {"id": emergency_id, "type": emergency_type, "level": emergency_list[0]["level_em"], "tmstp": emergency_list[0]["tmstp"]}
@@ -281,8 +284,8 @@ def set_done():
     if(emergency_id is not None):
         emergency = Emergency(emergency_id, None, None, None, None, None, None, None)
         value = emergency.set_em_done()
-        if(value == 200):
-            return jsonify(value)
+        if (value == 200):
+            return jsonify({"message": "Ok"})
         else:
             return abort(value)
     else:
