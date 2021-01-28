@@ -216,7 +216,7 @@ class Emergency:
             emergency = {"id": emergency_id, "type": emergency_type, "level": emergency_list[0]["level_em"], "tmstp": emergency_list[0]["tmstp"]}
 
             if emergency_type == 0: #Environmental emergency
-                sql = ("""SELECT environmental_data.*, room.* FROM emergency INNER JOIN environmental_data ON environmental_data.id = emergency.env_data_id INNER JOIN room ON room.id = environmental_data.room_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
+                sql = ("""SELECT environmental_data.*, room.id AS room_id, room.name_room AS room_name FROM emergency INNER JOIN environmental_data ON environmental_data.id = emergency.env_data_id INNER JOIN room ON room.id = environmental_data.room_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
                 cursor.execute(sql)
                 
                 join_columns = [column[0] for column in cursor.description]
@@ -224,10 +224,10 @@ class Emergency:
                 for row in cursor.fetchall():
                     join_list.append(dict(zip(join_columns, row)))
 
-                emergency_room_name = join_list[0]["name_room"]
+                room = {"id": join_list[0]["room_id"], "name": join_list[0]["room_id"]}
                 env_data = {"lux": join_list[0]["lux"], "voc": join_list[0]["voc"], "temperature": join_list[0]["degree"], "humidity": join_list[0]["humidity"]}
                 emergency["env_data"] = env_data
-                emergency["room_name"] = emergency_room_name
+                emergency["room"] = room
                 return emergency
             if emergency_type == 1: #Vital emergency
                 sql = ("""SELECT emergency.bed_id, vital_signs.* FROM emergency INNER JOIN vital_signs ON vital_signs.id = emergency.vital_signs_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
