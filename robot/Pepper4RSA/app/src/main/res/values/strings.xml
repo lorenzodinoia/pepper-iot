@@ -8,4 +8,6 @@
 
     <string name="localize">Localizza</string>
     <string name="start_service">Avvia servizio</string>
+    <string name="location_reached">Destinazione raggiunta</string>
+    <string name="goto_text">Mi dirigo verso…</string>
 </resources>

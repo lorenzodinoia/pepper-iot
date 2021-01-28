@@ -2,14 +2,20 @@ package it.uniba.di.sysag.pepper4rsa.utils.models;
 
 import android.os.Parcel;
 
+import com.google.gson.annotations.SerializedName;
+
 public class VitalData extends Model {
 
     private int bpm;
-    private float body_temperature;
-    private int min_body_pressure;
-    private int max_body_pressure;
-    private int blood_oxygenation;
-    private int inmate_id;
+    @SerializedName("body_temperature")
+    private float bodyTemperature;
+    @SerializedName("min_body_temperature")
+    private int minBodyPressure;
+    @SerializedName("max_body_pressure")
+    private int maxBodyPressure;
+    @SerializedName("blood_oxygenation")
+    private int bloodOxygenation;
+    private Inmate inmate;
 
 
     public void VitalData(){
@@ -31,22 +37,22 @@ public class VitalData extends Model {
     public VitalData(Parcel in) {
         super(in);
         this.bpm = in.readInt();
-        this.body_temperature = in.readFloat();
-        this.min_body_pressure = in.readInt();
-        this.max_body_pressure = in.readInt();
-        this.blood_oxygenation = in.readInt();
-        this.inmate_id = in.readInt();
+        this.bodyTemperature = in.readFloat();
+        this.minBodyPressure = in.readInt();
+        this.maxBodyPressure = in.readInt();
+        this.bloodOxygenation = in.readInt();
+        this.inmate = in.readParcelable(Inmate.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeInt(this.bpm);
-        dest.writeFloat(this.body_temperature);
-        dest.writeInt(this.min_body_pressure);
-        dest.writeInt(this.max_body_pressure);
-        dest.writeInt(this.blood_oxygenation);
-        dest.writeInt(this.inmate_id);
+        dest.writeFloat(this.bodyTemperature);
+        dest.writeInt(this.minBodyPressure);
+        dest.writeInt(this.maxBodyPressure);
+        dest.writeInt(this.bloodOxygenation);
+        dest.writeParcelable(this.inmate, flags);
     }
 
     public int getBpm() {
@@ -57,43 +63,43 @@ public class VitalData extends Model {
         this.bpm = bpm;
     }
 
-    public float getBody_temperature() {
-        return body_temperature;
+    public float getBodyTemperature() {
+        return bodyTemperature;
     }
 
-    public void setBody_temperature(float body_temperature) {
-        this.body_temperature = body_temperature;
+    public void setBodyTemperature(float bodyTemperature) {
+        this.bodyTemperature = bodyTemperature;
     }
 
-    public int getMin_body_pressure() {
-        return min_body_pressure;
+    public int getMinBodyPressure() {
+        return minBodyPressure;
     }
 
-    public void setMin_body_pressure(int min_body_pressure) {
-        this.min_body_pressure = min_body_pressure;
+    public void setMinBodyPressure(int minBodyPressure) {
+        this.minBodyPressure = minBodyPressure;
     }
 
-    public int getMax_body_pressure() {
-        return max_body_pressure;
+    public int getMaxBodyPressure() {
+        return maxBodyPressure;
     }
 
-    public void setMax_body_pressure(int max_body_pressure) {
-        this.max_body_pressure = max_body_pressure;
+    public void setMaxBodyPressure(int maxBodyPressure) {
+        this.maxBodyPressure = maxBodyPressure;
     }
 
-    public int getBlood_oxygenation() {
-        return blood_oxygenation;
+    public int getBloodOxygenation() {
+        return bloodOxygenation;
     }
 
-    public void setBlood_oxygenation(int blood_oxygenation) {
-        this.blood_oxygenation = blood_oxygenation;
+    public void setBloodOxygenation(int bloodOxygenation) {
+        this.bloodOxygenation = bloodOxygenation;
     }
 
-    public int getInmate_id() {
-        return inmate_id;
+    public Inmate getInmate() {
+        return inmate;
     }
 
-    public void setInmate_id(int inmate_id) {
-        this.inmate_id = inmate_id;
+    public void setInmate(Inmate inmate) {
+        this.inmate = inmate;
     }
 }

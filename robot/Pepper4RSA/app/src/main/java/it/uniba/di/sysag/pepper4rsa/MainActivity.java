@@ -30,13 +30,16 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.LocalizeAndMapHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.SaveFileHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.Vector2theta;
+import it.uniba.di.sysag.pepper4rsa.utils.models.Emergency;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Room;
+import it.uniba.di.sysag.pepper4rsa.utils.models.VitalData;
 import it.uniba.di.sysag.pepper4rsa.utils.provider.Providers;
+import it.uniba.di.sysag.pepper4rsa.utils.request.EmergencyRequest;
 import it.uniba.di.sysag.pepper4rsa.utils.request.RoomRequest;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
 
-public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks, NavigationListener {
+public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks {
     public static final String CONSOLE_TAG = "Pepper4RSA";
     private static final int PERMISSION_STORAGE = 1;
 
@@ -85,24 +88,8 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
             navigationFragment = new NavigationFragment();
             navigationFragment.setArguments(bundle);
             this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();*/
-            /*MainFragment mainFragment = new MainFragment();
-            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();*/
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> {
-                RoomRequest roomRequest = new RoomRequest();
-                roomRequest.readAll(new RequestListener<Collection<Room>>() {
-                    @Override
-                    public void successResponse(Collection<Room> response) {
-                        Log.d(MainActivity.CONSOLE_TAG, "Success");
-                    }
-
-                    @Override
-                    public void errorResponse(RequestException error) {
-                        Log.d(MainActivity.CONSOLE_TAG, "Error");
-                    }
-                });
-            }, 0, 2, TimeUnit.MINUTES);
-
+            MainFragment mainFragment = new MainFragment();
+            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -175,26 +162,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
     public TreeMap<String, AttachedFrame> getSavedLocations() {
         return savedLocations;
-    }
-
-    @Override
-    public void onNavigationStarted() {
-
-    }
-
-    @Override
-    public void onNavigationFinished() {
-
-    }
-
-    @Override
-    public void onNavigationCancelled() {
-
-    }
-
-    @Override
-    public void onNavigationFailed() {
-
     }
 
     public SaveFileHelper getSaveFileHelper() {

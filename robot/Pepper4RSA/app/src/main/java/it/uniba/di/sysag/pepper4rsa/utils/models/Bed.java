@@ -4,8 +4,8 @@ import android.os.Parcel;
 
 public class Bed extends Model{
 
-    private int roomId;
-    private int inmateId;
+    private Room room;
+    private Inmate inmate;
 
     public Bed (){
 
@@ -25,30 +25,30 @@ public class Bed extends Model{
 
     public Bed(Parcel in) {
         super(in);
-        this.roomId = in.readInt();
-        this.inmateId = in.readInt();
+        this.room = in.readParcelable(Room.class.getClassLoader());
+        this.inmate = in.readParcelable(Inmate.class.getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeInt(this.roomId);
-        dest.writeInt(this.inmateId);
+        dest.writeParcelable(this.room, flags);
+        dest.writeParcelable(this.inmate, flags);
     }
 
-    public int getRoomId() {
-        return roomId;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
+    public void setRoomId(Room room) {
+        this.room = room;
     }
 
-    public int getInmateId() {
-        return inmateId;
+    public Inmate getInmate() {
+        return inmate;
     }
 
-    public void setInmateId(int inmateId) {
-        this.inmateId = inmateId;
+    public void setInmateId(Inmate inmate) {
+        this.inmate = inmate;
     }
 }

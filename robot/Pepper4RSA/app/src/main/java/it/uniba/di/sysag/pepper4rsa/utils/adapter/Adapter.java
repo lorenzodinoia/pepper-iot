@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import it.uniba.di.sysag.pepper4rsa.utils.models.Emergency;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Model;
 
 public class Adapter<T extends Model> {
@@ -20,6 +22,7 @@ public class Adapter<T extends Model> {
     private static final Gson jsonConverter = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .setDateFormat(JSON_DATETIME_FORMAT)
+            .registerTypeAdapter(Emergency.class, new EmergencyAdapter())
             .create();
 
     public JSONObject toJSON(T object) throws JSONException {

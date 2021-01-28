@@ -8,7 +8,7 @@ public class EnvData extends Model{
     private float voc;
     private float degree;
     private int humidity;
-    private int roomId;
+    private Room room;
 
     public EnvData (){
 
@@ -32,7 +32,7 @@ public class EnvData extends Model{
         this.voc = in.readFloat();
         this.degree = in.readFloat();
         this.humidity = in.readInt();
-        this.roomId = in.readInt();
+        this.room = in.readParcelable(Room.class.getClassLoader());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class EnvData extends Model{
         dest.writeFloat(this.voc);
         dest.writeFloat(this.degree);
         dest.writeInt(this.humidity);
-        dest.writeInt(this.roomId);
+        dest.writeParcelable(this.room, flags);
     }
 
     public int getLux() {
@@ -77,11 +77,11 @@ public class EnvData extends Model{
         this.humidity = humidity;
     }
 
-    public int getRoomId() {
-        return roomId;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }

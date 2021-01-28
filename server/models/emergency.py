@@ -224,7 +224,7 @@ class Emergency:
                 for row in cursor.fetchall():
                     join_list.append(dict(zip(join_columns, row)))
 
-                room = {"id": join_list[0]["room_id"], "name": join_list[0]["room_id"]}
+                room = {"id": join_list[0]["room_id"], "name": join_list[0]["room_name"]}
                 env_data = {"lux": join_list[0]["lux"], "voc": join_list[0]["voc"], "temperature": join_list[0]["degree"], "humidity": join_list[0]["humidity"]}
                 emergency["env_data"] = env_data
                 emergency["room"] = room
