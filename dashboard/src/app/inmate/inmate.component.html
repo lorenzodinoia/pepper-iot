@@ -1,15 +1,26 @@
 <div class="container-fluid" *ngIf="inmate">
-    <div class="row">
-        <div class="col col-lg-4 card">
-            <h4>{{inmate.name}} {{inmate.surname}}</h4>
-            <p>{{inmate.cf}}</p>
-            <p>{{inmate.birthDate}}</p>
+    <h4>{{inmate.name}} {{inmate.surname}}</h4>
+    <p>{{inmate.cf}}</p>
+    <p>{{inmate.birthDate}}</p>
+    <hr class="divider"/>
+    <br>
+    
+    <div>
+        <div class="row">
+            <div class="col">
+                <inmate-temperature-chart [id]="inmate.id"></inmate-temperature-chart>
+            </div>
+            <div class="col">
+                <inmate-bpm-chart [id]="inmate.id"></inmate-bpm-chart>
+            </div>
         </div>
-        <div class="col card">
-            <inmate-temperature-chart [id]="inmate.id"></inmate-temperature-chart>
-            <inmate-bpm-chart [id]="inmate.id"></inmate-bpm-chart>
-            <inmate-oxygenation-chart [id]="inmate.id"></inmate-oxygenation-chart>
-            <inmate-pressure-chart [id]="inmate.id"></inmate-pressure-chart>
+        <div class="row">
+            <div class="col">
+                <inmate-oxygenation-chart [id]="inmate.id"></inmate-oxygenation-chart>
+            </div>
+            <div class="col">
+                <inmate-pressure-chart [id]="inmate.id"></inmate-pressure-chart>
+            </div>
         </div>
-    </div>
+    </div>  
 </div>
