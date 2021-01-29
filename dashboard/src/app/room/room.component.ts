@@ -13,7 +13,7 @@ export class RoomComponent implements OnInit {
   public room!: Room;
   public lastUpdateAsString!: string;
 
-  constructor(private _client: Client, private _activatedRoute: ActivatedRoute, public _datePipe: DatePipe) { }
+  constructor(private _client: Client, private _activatedRoute: ActivatedRoute, private _datePipe: DatePipe) { }
 
   ngOnInit(): void {
     let urlParams: ParamMap = this._activatedRoute.snapshot.paramMap;

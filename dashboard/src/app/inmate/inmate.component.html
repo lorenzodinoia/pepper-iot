@@ -1,7 +1,7 @@
 <div class="container-fluid" *ngIf="inmate">
     <h4>{{inmate.name}} {{inmate.surname}}</h4>
     <p>{{inmate.cf}}</p>
-    <p>{{inmate.birthDate}}</p>
+    <p class="text-secondary">Ultimo aggiornamento: {{lastUpdateAsString}}</p>
     <hr class="divider"/>
     <br>
     
