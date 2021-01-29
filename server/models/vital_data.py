@@ -144,7 +144,11 @@ class Vital_data:
                 password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
-            cursor.execute("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.inmate_id))
+            sql = """SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();"""
+            if field != "pressure":
+                cursor.execute(sql % (field, self.inmate_id))
+            else:
+                cursor.execute(sql % ("min_body_pressure, max_body_pressure", self.inmate_id))
             columns = [column[0] for column in cursor.description]
             data = []
             for row in cursor.fetchall():
@@ -154,7 +158,10 @@ class Vital_data:
             for element in data:
                 tmstp = element["tmstp"]
                 hour = ("%s:%s" % (tmstp.hour, tmstp.minute))
-                series.append({"hour": hour, "value": element[field]})
+                if field != "pressure":
+                    series.append({"hour": hour, "value": element[field]})
+                else:
+                    series.append({"hour": hour, "value_min": element["min_body_pressure"], "value_max": element["max_body_pressure"]})
 
             return series
         except:
