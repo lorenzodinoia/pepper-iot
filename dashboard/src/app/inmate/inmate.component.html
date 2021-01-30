@@ -1,20 +1,25 @@
 <div class="container-fluid" *ngIf="inmate">
-    <h4>{{inmate.name}} {{inmate.surname}}</h4>
-    <p>{{inmate.cf}}</p>
-    <p class="text-secondary">Ultimo aggiornamento: {{lastUpdateAsString}}</p>
+    <div class="row gx-1 justify-content-start">
+        <div class="col-sm-auto align-self-center">
+            <img class="rounded-circle z-depth-2" src="/assets/images/avatar.jpg" style="border: 1px solid lightgray; margin: 5px; height: 10rem; width: 10rem;">
+        </div>
+        <div class="col align-self-center">
+            <h2>{{inmate.name}} {{inmate.surname}}</h2>
+            <p>{{inmate.cf}}</p>
+            <p class="text-secondary">Ultimo aggiornamento: {{lastUpdateAsString}}</p>
+        </div>
+    </div>
     <hr class="divider"/>
     <br>
     
     <div>
-        <div class="row">
+        <div class="row g-2 row-cols-2">
             <div class="col">
                 <inmate-temperature-chart [id]="inmate.id"></inmate-temperature-chart>
             </div>
             <div class="col">
                 <inmate-bpm-chart [id]="inmate.id"></inmate-bpm-chart>
             </div>
-        </div>
-        <div class="row">
             <div class="col">
                 <inmate-oxygenation-chart [id]="inmate.id"></inmate-oxygenation-chart>
             </div>
