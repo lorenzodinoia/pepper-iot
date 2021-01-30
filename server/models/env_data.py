@@ -120,7 +120,7 @@ class Environmental_data:
             if mydb.is_connected():
                 mydb.close()
 
-    def get_series(self, field: str):
+    def get_series(self, field: str, start: str, end: str):
         mydb = None
         try:
             mydb = mysql.connector.connect(
@@ -128,8 +128,15 @@ class Environmental_data:
                 database = os.getenv("DATABASE_NAME"),
                 password = os.getenv("DATABASE_PASSWORD")
             )
+
+            if (start != None and end != None):
+                sql = """SELECT %s, tmstp FROM pepperiot.environmental_data WHERE room_id = %d AND tmstp BETWEEN "%s" AND "%s";""" % (field, self.room_id, start, end)
+            else:
+                sql = """SELECT %s, tmstp FROM pepperiot.environmental_data WHERE room_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.room_id)
+
             cursor = mydb.cursor()
-            cursor.execute("""SELECT %s, tmstp FROM pepperiot.environmental_data WHERE room_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.room_id))
+            cursor.execute(sql)
+
             columns = [column[0] for column in cursor.description]
             data = []
             for row in cursor.fetchall():
@@ -175,9 +182,12 @@ def get_latest():
 def get():
     room_id = request.args.get("room_id", default=None, type=int)
     field = request.args.get("field", default=None, type=str)
+    start = request.args.get("start", default=None, type=str)
+    end = request.args.get("end", default=None, type=str)
+
     if (room_id is not None) and (field is not None):
         obj = Environmental_data(None, None, None, None, None, None, room_id)
-        value = obj.get_series(field)
+        value = obj.get_series(field, start, end)
         if(value != 500):
             return jsonify({"values" : value})
         else:

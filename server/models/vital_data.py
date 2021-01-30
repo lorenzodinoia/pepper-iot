@@ -135,7 +135,7 @@ class Vital_data:
             if mydb.is_connected():
                 mydb.close()
 
-    def get_series(self, field: str):
+    def get_series(self, field: str, start: str, end: str):
         mydb = None
         try:
             mydb = mysql.connector.connect(
@@ -143,12 +143,18 @@ class Vital_data:
                 database = os.getenv("DATABASE_NAME"),
                 password = os.getenv("DATABASE_PASSWORD")
             )
-            cursor = mydb.cursor()
-            sql = """SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();"""
-            if field != "pressure":
-                cursor.execute(sql % (field, self.inmate_id))
+            
+            if field == "pressure":
+                field = "min_body_pressure, max_body_pressure"
+            
+            if (start != None and end != None):
+                sql = ("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp BETWEEN "%s" AND "%s";""" % (field, self.inmate_id, start, end))
             else:
-                cursor.execute(sql % ("min_body_pressure, max_body_pressure", self.inmate_id))
+                sql = ("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.inmate_id))
+            
+            cursor = mydb.cursor()
+            cursor.execute(sql)
+
             columns = [column[0] for column in cursor.description]
             data = []
             for row in cursor.fetchall():
@@ -158,7 +164,7 @@ class Vital_data:
             for element in data:
                 tmstp = element["tmstp"]
                 hour = ("%s:%s" % (tmstp.hour, tmstp.minute))
-                if field != "pressure":
+                if field != "min_body_pressure, max_body_pressure":
                     series.append({"hour": hour, "value": element[field]})
                 else:
                     series.append({"hour": hour, "value_min": element["min_body_pressure"], "value_max": element["max_body_pressure"]})
@@ -169,7 +175,6 @@ class Vital_data:
         finally:
             if mydb.is_connected():
                 mydb.close()
-
 
 
 
@@ -203,9 +208,12 @@ def get_latest():
 def get():
     inmate_id = request.args.get("inmate_id", default=None, type=int)
     field = request.args.get("field", default=None, type=str)
+    start = request.args.get("start", default=None, type=str)
+    end = request.args.get("end", default=None, type=str)
+
     if (inmate_id is not None) and (field is not None):
         obj = Vital_data(None, None, None, None, None, None, None, inmate_id)
-        value = obj.get_series(field)
+        value = obj.get_series(field, start, end)
         if(value != 500):
             return jsonify({"values" : value})
         else:
