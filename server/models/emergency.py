@@ -241,14 +241,16 @@ class Emergency:
                 for row in cursor.fetchall():
                     join_list.append(dict(zip(join_columns, row)))
                 
-                emergency_room_name = emergency_list[0]["bed_id"]
+                emergency_bed_id = emergency_list[0]["bed_id"]
                 env_data = {"bpm": join_list[0]["bpm"], "body_temperature": join_list[0]["body_temperature"], "min_body_pressure": join_list[0]["min_body_pressure"], 
                             "max_body_pressure": join_list[0]["max_body_pressure"], "blood_oxygenation": join_list[0]["blood_oxygenation"]}
                 emergency["vital_signs"] = env_data
-                emergency["bed_id"] = emergency_room_name
+                emergency["bed_id"] = emergency_bed_id
                 return emergency
             if emergency_type == 2: #Button pressed
-                pass
+                emergency_bed_id = emergency_list[0]["bed_id"]
+                emergency["bed_id"] = emergency_bed_id
+                return emergency
         except Exception as e:
             print(e)
             return 500
