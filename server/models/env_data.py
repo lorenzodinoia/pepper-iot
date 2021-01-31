@@ -66,18 +66,14 @@ class Environmental_data:
                     mydb.close()
             
             emergency_flag = False
-            if(self.lux < MIN_LUX):
+            if((self.lux < MIN_LUX) or (self.lux > MAX_LUX)):
                 if(self.lux > 0):
                     emergency_flag = True
-            if(self.lux > MAX_LUX):
-                emergency_flag = True
             if(self.voc > MAX_VOC):
                 emergency_flag = True
-            if(self.degree < MIN_DEGREE):
+            if((self.degree < MIN_DEGREE) or (self.degree > MAX_DEGREE)):
                 if(self.degree > 0):
                     emergency_flag = True
-            if(self.degree > MAX_DEGREE):
-                emergency_flag = True
             if(self.humidity < MAX_DEGREE):
                 emergency_flag = True
 

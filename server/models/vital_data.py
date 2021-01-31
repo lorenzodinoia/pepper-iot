@@ -12,7 +12,9 @@ MIN_BPM = 60
 MAX_BPM = 100
 MIN_BODY_TEMPERATURE = 35
 MAX_BODY_TEMPERATURE = 37.5
+MIN_MIN_BODY_PRESSURE = 60
 MAX_MIN_BODY_PRESSURE = 80
+MIN_MAX_BODY_PRESSURE = 90
 MAX_MAX_BODY_PRESSURE = 120
 MIN_BLOOD_OXYGENATION = 95
 
@@ -78,20 +80,18 @@ class Vital_data:
                     return 400
             
             emergency_flag = False
-            if(self.bpm < MIN_BPM):
+            if((self.bpm < MIN_BPM) or (self.bpm > MAX_BPM)):
                 if(self.bpm > 0):
                     emergency_flag = True
-            if(self.bpm > MAX_BPM):
-                emergency_flag = True
-            if(self.body_temperature < MIN_BODY_TEMPERATURE):
+            if((self.body_temperature < MIN_BODY_TEMPERATURE) or (self.body_temperature > MAX_BODY_TEMPERATURE)):
                 if(self.body_temperature > 0):
                     emergency_flag = True
-            if(self.body_temperature > MAX_BODY_TEMPERATURE):
-                emergency_flag = True
-            if(self.min_body_pressure > MAX_MIN_BODY_PRESSURE):
-                emergency_flag = True
-            if(self.max_body_pressure > MAX_MAX_BODY_PRESSURE):
-                emergency_flag = True
+            if((self.min_body_pressure < MIN_MIN_BODY_PRESSURE) or (self.min_body_pressure > MAX_MIN_BODY_PRESSURE)):
+                if(self.min_body_pressure > 0):
+                    emergency_flag = True
+            if((self.max_body_pressure < MIN_MAX_BODY_PRESSURE) or (self.max_body_pressure > MAX_MAX_BODY_PRESSURE)):
+                if(self.max_body_pressure > 0):
+                    emergency_flag = True
             if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
                 if(self.blood_oxygenation > 0):
                     emergency_flag = True
