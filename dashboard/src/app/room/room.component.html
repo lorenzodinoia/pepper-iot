@@ -2,27 +2,25 @@
     <h2>{{room.name}}</h2>
     <p class="text-secondary">Ultimo aggiornamento: {{lastUpdateAsString}}</p>
     <hr class="divider"/>
-    <div class="row row justify-content-center">
+    <div class="row g-1 justify-content-center">
         <div class="col">
-            <room-temperature-chart></room-temperature-chart>
+            <room-temperature-chart [id]="room.id"></room-temperature-chart>
         </div>
         <div class="col">
-            <room-humidity-chart></room-humidity-chart>
+            <room-humidity-chart [id]="room.id"></room-humidity-chart>
         </div>
         <div class="col">
-            <room-lux-chart></room-lux-chart>
+            <room-lux-chart [id]="room.id"></room-lux-chart>
         </div>
         <div class="col">
-            <room-voc-chart></room-voc-chart>
+            <room-voc-chart [id]="room.id"></room-voc-chart>
         </div>
     </div>
 
     <br>
     <br>
 
-    <div class="container-fluid">
-        <div *ngFor="let bed of room.beds">
-            <inmate-summary [inmate]="bed.inmate"></inmate-summary>
-        </div>
+    <div class="container-fluid bg-light" *ngFor="let bed of room.beds">
+        <inmate-summary [inmate]="bed.inmate"></inmate-summary>
     </div>
 </div>

@@ -1,8 +1,10 @@
 <div class="card" style="width: auto;">
     <div class="card-body">
-        <h5>Temperatura</h5>
-        <h4>{{latest}} C°</h4>
-        <div echarts [options]="chartOptions" class="room-chart"></div>
+        <div *ngIf="latest">
+            <h5>Temperatura</h5>
+            <h4>{{latest}} C°</h4>
+        </div>
+        <div echarts *ngIf="chartOptions" [options]="chartOptions" class="room-chart"></div>
+        <p *ngIf="!chartOptions" class="text-secondary text-center">Non ci sono dati da mostrare</p>
     </div>
 </div>
-

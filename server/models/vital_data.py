@@ -12,7 +12,9 @@ MIN_BPM = 60
 MAX_BPM = 100
 MIN_BODY_TEMPERATURE = 35
 MAX_BODY_TEMPERATURE = 37.5
+MIN_MIN_BODY_PRESSURE = 60
 MAX_MIN_BODY_PRESSURE = 80
+MIN_MAX_BODY_PRESSURE = 90
 MAX_MAX_BODY_PRESSURE = 120
 MIN_BLOOD_OXYGENATION = 95
 
@@ -78,20 +80,18 @@ class Vital_data:
                     return 400
             
             emergency_flag = False
-            if(self.bpm < MIN_BPM):
+            if((self.bpm < MIN_BPM) or (self.bpm > MAX_BPM)):
                 if(self.bpm > 0):
                     emergency_flag = True
-            if(self.bpm > MAX_BPM):
-                emergency_flag = True
-            if(self.body_temperature < MIN_BODY_TEMPERATURE):
+            if((self.body_temperature < MIN_BODY_TEMPERATURE) or (self.body_temperature > MAX_BODY_TEMPERATURE)):
                 if(self.body_temperature > 0):
                     emergency_flag = True
-            if(self.body_temperature > MAX_BODY_TEMPERATURE):
-                emergency_flag = True
-            if(self.min_body_pressure > MAX_MIN_BODY_PRESSURE):
-                emergency_flag = True
-            if(self.max_body_pressure > MAX_MAX_BODY_PRESSURE):
-                emergency_flag = True
+            if((self.min_body_pressure < MIN_MIN_BODY_PRESSURE) or (self.min_body_pressure > MAX_MIN_BODY_PRESSURE)):
+                if(self.min_body_pressure > 0):
+                    emergency_flag = True
+            if((self.max_body_pressure < MIN_MAX_BODY_PRESSURE) or (self.max_body_pressure > MAX_MAX_BODY_PRESSURE)):
+                if(self.max_body_pressure > 0):
+                    emergency_flag = True
             if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
                 if(self.blood_oxygenation > 0):
                     emergency_flag = True
@@ -135,7 +135,7 @@ class Vital_data:
             if mydb.is_connected():
                 mydb.close()
 
-    def get_series(self, field: str):
+    def get_series(self, field: str, start: str, end: str):
         mydb = None
         try:
             mydb = mysql.connector.connect(
@@ -143,8 +143,18 @@ class Vital_data:
                 database = os.getenv("DATABASE_NAME"),
                 password = os.getenv("DATABASE_PASSWORD")
             )
+            
+            if field == "pressure":
+                field = "min_body_pressure, max_body_pressure"
+            
+            if (start != None and end != None):
+                sql = ("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp BETWEEN "%s" AND "%s";""" % (field, self.inmate_id, start, end))
+            else:
+                sql = ("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.inmate_id))
+            
             cursor = mydb.cursor()
-            cursor.execute("""SELECT %s, tmstp FROM pepperiot.vital_signs WHERE inmate_id = %d AND tmstp > DATE_SUB(NOW(), INTERVAL 24 HOUR) AND tmstp <= NOW();""" % (field, self.inmate_id))
+            cursor.execute(sql)
+
             columns = [column[0] for column in cursor.description]
             data = []
             for row in cursor.fetchall():
@@ -154,7 +164,10 @@ class Vital_data:
             for element in data:
                 tmstp = element["tmstp"]
                 hour = ("%s:%s" % (tmstp.hour, tmstp.minute))
-                series.append({"hour": hour, "value": element[field]})
+                if field != "min_body_pressure, max_body_pressure":
+                    series.append({"hour": hour, "value": element[field]})
+                else:
+                    series.append({"hour": hour, "value_min": element["min_body_pressure"], "value_max": element["max_body_pressure"]})
 
             return series
         except:
@@ -162,7 +175,6 @@ class Vital_data:
         finally:
             if mydb.is_connected():
                 mydb.close()
-
 
 
 
@@ -196,9 +208,12 @@ def get_latest():
 def get():
     inmate_id = request.args.get("inmate_id", default=None, type=int)
     field = request.args.get("field", default=None, type=str)
+    start = request.args.get("start", default=None, type=str)
+    end = request.args.get("end", default=None, type=str)
+
     if (inmate_id is not None) and (field is not None):
         obj = Vital_data(None, None, None, None, None, None, None, inmate_id)
-        value = obj.get_series(field)
+        value = obj.get_series(field, start, end)
         if(value != 500):
             return jsonify({"values" : value})
         else:

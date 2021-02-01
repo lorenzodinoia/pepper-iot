@@ -21,6 +21,8 @@ import { InmateOxygenationChartComponent } from './inmate-oxygenation-chart/inma
 import { InmateBpmChartComponent } from './inmate-bpm-chart/inmate-bpm-chart.component';
 import { InmatePressureChartComponent } from './inmate-pressure-chart/inmate-pressure-chart.component';
 import { DatePipe } from '@angular/common';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -39,7 +41,8 @@ import { DatePipe } from '@angular/common';
     InmateTemperatureChartComponent,
     InmateOxygenationChartComponent,
     InmateBpmChartComponent,
-    InmatePressureChartComponent
+    InmatePressureChartComponent,
+    SidebarComponent
   ],
   imports: [
     BrowserModule,
@@ -48,6 +51,7 @@ import { DatePipe } from '@angular/common';
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts')
     }),
+    NgbModule,
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent]

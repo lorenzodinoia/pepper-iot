@@ -1,9 +1,9 @@
 <div class="card text-center">
     <a [routerLink]="['/inmate', bed.inmate.id]">
-        <img src="/assets/images/bed.png" class="card-img-top img-responsive">
+        <img src="/assets/images/bed.png" class="card-img-top img-responsive" style="max-width: 10rem;">
         <div class="card-body">
-        <p class="card-text">Letto {{bed.id}}</p>
-        <p class="card-text text-secondary">{{bed.inmate.name}} {{bed.inmate.surname}}</p>
+            <p class="card-text">{{bed.inmate.name}} {{bed.inmate.surname}}</p>
+            <p class="card-text text-secondary">Letto #{{bed.id}}</p>
         </div>
     </a>
 </div>

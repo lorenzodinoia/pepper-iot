@@ -1,9 +1,5 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
 
-body {
-    margin-top: 60px; //Due to avoid navbar overlaps content
-}
-
 .room-chart {
     width: 400px; 
     height: 300px;
@@ -17,4 +13,5 @@ body {
 .vital-sign-card {
     min-width: 15rem;
     max-width: 17rem;
+    height: 7rem;
 }

@@ -11,6 +11,7 @@ export class InmateOxygenationChartComponent implements OnInit {
   @Input()
   public id!: number;
   public chartOptions: any;
+  public latest!: number;
 
   constructor(private _client: Client) { }
 
@@ -21,16 +22,22 @@ export class InmateOxygenationChartComponent implements OnInit {
       let hours: Array<string> = [];
       let values: Array<number> = [];
       let valuesJson: any = response["values"];
-      for(let index in valuesJson) {
+      
+      for (let index in valuesJson) {
         let item: any = valuesJson[index];
         hours.push(item["hour"]);
         values.push(item["value"]);
       }
-      this.setData(hours, values);
+
+      if (values.length != 0) {
+        this.setData(hours, values);
+      }
     });
   }
 
   private setData(hours: Array<string>, values: Array<number>): void {
+    this.latest = values[values.length - 1];
+    
     this.chartOptions = {
       tooltip: {
         show: true
@@ -40,7 +47,8 @@ export class InmateOxygenationChartComponent implements OnInit {
           id: 'dataZoomX',
           type: 'slider',
           xAxisIndex: [0],
-          filterMode: 'filter'
+          filterMode: 'filter',
+          start: 80 //TODO Adattare al numero di valori con una formula
       },
       {
           id: 'dataZoomY',

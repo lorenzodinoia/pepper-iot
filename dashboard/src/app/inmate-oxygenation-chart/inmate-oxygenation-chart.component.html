@@ -1,1 +1,10 @@
-<div echarts [options]="chartOptions" class="inmate-chart"></div>
+<div class="card" style="width: auto;">
+    <div class="card-body">
+        <div *ngIf="latest">
+            <h5>Ossigenazione</h5>
+            <h4>{{latest}} %</h4>
+        </div>
+        <div echarts *ngIf="chartOptions" [options]="chartOptions" class="inmate-chart"></div>
+        <p *ngIf="!chartOptions" class="text-secondary text-center">Non ci sono dati da mostrare</p>
+    </div>
+</div>

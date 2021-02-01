@@ -211,6 +211,9 @@ class Emergency:
             for row in cursor.fetchall():
                 emergency_list.append(dict(zip(emergency_columns, row)))
 
+            if len(emergency_list) == 0:
+                return {}
+
             emergency_id = emergency_list[0]["id"]
             emergency_type = emergency_list[0]["type_em"]
             emergency = {"id": emergency_id, "type": emergency_type, "level": emergency_list[0]["level_em"], "tmstp": emergency_list[0]["tmstp"]}
@@ -238,14 +241,16 @@ class Emergency:
                 for row in cursor.fetchall():
                     join_list.append(dict(zip(join_columns, row)))
                 
-                emergency_room_name = emergency_list[0]["bed_id"]
+                emergency_bed_id = emergency_list[0]["bed_id"]
                 env_data = {"bpm": join_list[0]["bpm"], "body_temperature": join_list[0]["body_temperature"], "min_body_pressure": join_list[0]["min_body_pressure"], 
                             "max_body_pressure": join_list[0]["max_body_pressure"], "blood_oxygenation": join_list[0]["blood_oxygenation"]}
                 emergency["vital_signs"] = env_data
-                emergency["bed_id"] = emergency_room_name
+                emergency["bed_id"] = emergency_bed_id
                 return emergency
             if emergency_type == 2: #Button pressed
-                pass
+                emergency_bed_id = emergency_list[0]["bed_id"]
+                emergency["bed_id"] = emergency_bed_id
+                return emergency
         except Exception as e:
             print(e)
             return 500
@@ -281,15 +286,15 @@ def set_done():
     if(emergency_id is not None):
         emergency = Emergency(emergency_id, None, None, None, None, None, None, None)
         value = emergency.set_em_done()
-        if(value == 200):
-            return jsonify(value)
+        if (value == 200):
+            return jsonify({"message": "Ok"})
         else:
             return abort(value)
     else:
         return abort(400)
 
 @emergency_blueprint.route("/next", methods=["GET"]) #Get latest emergency
-def get_latest():
+def get_next():
     emergency = Emergency(None, None, None, None, None, None, None, None)
     value = emergency.get_next()
     if(value != 500):

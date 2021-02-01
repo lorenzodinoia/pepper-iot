@@ -11,26 +11,37 @@ export class InmatePressureChartComponent implements OnInit {
   @Input()
   public id!: number;
   public chartOptions: any;
+  public latest!: string;
 
   constructor(private _client: Client) { }
 
   ngOnInit(): void {
-    this._client.httpClient.get(`${Client.SERVER_URL}/vital_signs/series/?inmate_id=${this.id}&field=body_temperature`, Client.OPTIONS).pipe(map((response: any) => {
+    this._client.httpClient.get(`${Client.SERVER_URL}/vital_signs/series/?inmate_id=${this.id}&field=pressure`, Client.OPTIONS).pipe(map((response: any) => {
       return response;
     })).subscribe((response) => {
       let hours: Array<string> = [];
-      let values: Array<number> = [];
+      let minValues: Array<number> = [];
+      let maxValues: Array<number> = [];
       let valuesJson: any = response["values"];
-      for(let index in valuesJson) {
+
+      for (let index in valuesJson) {
         let item: any = valuesJson[index];
         hours.push(item["hour"]);
-        values.push(item["value"]);
+        minValues.push(item["value_min"]);
+        maxValues.push(item["value_max"]);
       }
-      this.setData(hours, values);
+
+      if (minValues.length != 0) {
+        this.setData(hours, minValues, maxValues);
+      }
     });
   }
 
-  private setData(hours: Array<string>, values: Array<number>): void {
+  private setData(hours: Array<string>, minValues: Array<number>, maxValues: Array<number>): void {
+    let minLatest: number = minValues[minValues.length - 1];
+    let maxLatest: number = maxValues[maxValues.length - 1];
+    this.latest = `${minLatest}/${maxLatest}`;
+
     this.chartOptions = {
       tooltip: {
         show: true
@@ -39,8 +50,9 @@ export class InmatePressureChartComponent implements OnInit {
       {
           id: 'dataZoomX',
           type: 'slider',
-          xAxisIndex: [0],
-          filterMode: 'filter'
+          xAxisIndex: [0, 1],
+          filterMode: 'filter',
+          start: 80 //TODO Adattare al numero di valori con una formula
       },
       {
           id: 'dataZoomY',
@@ -61,9 +73,16 @@ export class InmatePressureChartComponent implements OnInit {
       },
       series: [
         {
-          name: 'Temperatura',
+          name: 'Pressione minima',
           type: 'line',
-          data: values,
+          data: minValues,
+          itemStyle: {color: "brown"},
+          lineStyle: {color: "brown"}
+        },
+        {
+          name: 'Pressione massima',
+          type: 'line',
+          data: maxValues,
           itemStyle: {color: "brown"},
           lineStyle: {color: "brown"}
         }
