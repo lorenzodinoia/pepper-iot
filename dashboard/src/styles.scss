@@ -11,7 +11,18 @@
 }
 
 .vital-sign-card {
-    min-width: 15rem;
-    max-width: 17rem;
+    min-width: 18rem;
+    max-width: 22rem;
     height: 7rem;
+}
+
+.vital-sign-card-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.chart-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 1rem;
 }
