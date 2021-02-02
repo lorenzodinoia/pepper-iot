@@ -13,18 +13,38 @@
     <br>
     
     <div>
-        <div class="row g-2 row-cols-2">
-            <div class="col">
-                <inmate-temperature-chart [id]="inmate.id"></inmate-temperature-chart>
+        <div class="container">
+            <p class="text-center">Filtra i dati</p>
+            <div class="row justify-content-center align-items-end">
+                <div class="col-sm">
+                    <label for="startDate" class="form-label">A partire da</label>
+                    <input #startDate id="startDate" type="datetime-local" class="form-control" [max]="todayAsString">
+                </div>
+                <div class="col-sm">
+                    <label for="endDate" class="form-label">Fino a</label>
+                    <input #endDate id="endDate" type="datetime-local" class="form-control" [max]="todayAsString">
+                </div>
+                <div class="col-sm-auto">
+                    <button type="button" class="btn btn-outline-primary" (click)="applyFilter()">Applica filtro</button>
+                </div>
+                <div class="col-sm-auto">
+                    <button type="button" class="btn btn-outline-danger" (click)="resetFilter()" [disabled]="!canResetFilter">Pulisci</button>
+                </div>
             </div>
-            <div class="col">
-                <inmate-bpm-chart [id]="inmate.id"></inmate-bpm-chart>
+        </div>
+        <br>
+        <div class="row justify-content-center">
+            <div class="col-sm-auto">
+                <inmate-temperature-chart #temperatureChart [id]="inmate.id"></inmate-temperature-chart>
             </div>
-            <div class="col">
-                <inmate-oxygenation-chart [id]="inmate.id"></inmate-oxygenation-chart>
+            <div class="col-sm-auto">
+                <inmate-bpm-chart #bpmChart [id]="inmate.id"></inmate-bpm-chart>
             </div>
-            <div class="col">
-                <inmate-pressure-chart [id]="inmate.id"></inmate-pressure-chart>
+            <div class="col-sm-auto">
+                <inmate-oxygenation-chart #oxygenationChart [id]="inmate.id"></inmate-oxygenation-chart>
+            </div>
+            <div class="col-sm-auto">
+                <inmate-pressure-chart #pressureChart [id]="inmate.id"></inmate-pressure-chart>
             </div>
         </div>
     </div>  
