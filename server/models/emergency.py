@@ -13,6 +13,7 @@ type_em indicates the type of emergency. It could be of three different types:
     0 - env_data emergency
     1 - vital_data emergency
     2 - emergency button (AWS)
+    3 - send pepper (dashboard)
 done indicates if the emergency is already managed or not
 """
 class Emergency:
@@ -70,7 +71,7 @@ class Emergency:
                     else:
                         return 400
 
-                elif(self.type_em == 2):
+                elif((self.type_em == 2) or (self.type_em == 3)):
                     if("bed_id" in data):
                         self.bed_id = data["bed_id"]
 
@@ -95,6 +96,7 @@ class Emergency:
                         #Check if there is another emergency for the same inmate that has a timestamp difference below 1 min.
                         valid = True
                         now = datetime.now()
+                        print(list)
                         for vital_sign in list:
                             difference = now - vital_sign["tmstp_em"]
                             if(difference.seconds < 60) : 
