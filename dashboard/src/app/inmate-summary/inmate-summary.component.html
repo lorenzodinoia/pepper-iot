@@ -1,11 +1,11 @@
 <div class="row g-1 justify-content-md-center align-items-center">
-    <div class="col-2">
-        <div class="card" style="height: 9rem; min-width: 15rem;">
+    <div class="col-sm-auto">
+        <div class="card" style="height: auto; min-width: 20rem;">
             <div class="row no-gutters align-items-center">
-                <div class="col-sm-5">
-                    <img class="card-img rounded-circle z-depth-2" src="/assets/images/avatar.jpg" style="border: 1px solid lightgray; margin: 5px;">
+                <div class="col-sm-auto">
+                    <img class="card-img rounded-circle z-depth-2 inmate-card-image" src="/assets/images/avatar.jpg">
                 </div>
-                <div class="col-sm-7">
+                <div class="col-md-auto">
                     <div class="card-body">
                         <a [routerLink]="['/inmate', inmate.id]">
                             <h5 class="card-title">{{inmate.name}} {{inmate.surname}}</h5>
@@ -17,59 +17,64 @@
             </div>
         </div>  
     </div>
-    <div class="col-8">
-        <div class="row g-1 justify-content-around">
-            <div class="col-2 card vital-sign-card">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-sm-auto">
-                        <img class="card-img vital-sign-card-icon" src="/assets/images/lungs.png">
-                    </div>
-                    <div class="col-sm-auto">
-                        <div class="card-body">
-                            <h5 class="card-title">Ossigenazione</h5>
-                            <h4>{{inmate.vitalSigns.bloodOxygenation}} %</h4>
+    <div class="col-lg-auto">
+        <div class="row justify-content-around">
+            <div class="col-2 ">
+                <div class="card vital-sign-card">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-sm-auto">
+                            <img class="card-img vital-sign-card-icon" src="/assets/images/lungs.png">
+                        </div>
+                        <div class="col-sm-auto">
+                            <div class="card-body">
+                                <h5 class="card-title">Ossigenazione</h5>
+                                <h4>{{inmate.vitalSigns.bloodOxygenation}} %</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-2 card vital-sign-card">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-sm-auto">
-                        <img class="card-img vital-sign-card-icon" src="/assets/images/pressure.png">
-                    </div>
-                    <div class="col-sm-auto">
-                        <div class="card-body">
-                            <h5 class="card-title">Pressione</h5>
-                            <h4>{{inmate.vitalSigns.bloodMinPressure}}/{{inmate.vitalSigns.bloodMaxPressure}} mmHg</h4>
+            <div class="col-2 ">
+                <div class="card vital-sign-card">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-sm-auto">
+                            <img class="card-img vital-sign-card-icon" src="/assets/images/pressure.png">
+                        </div>
+                        <div class="col-sm-auto">
+                            <div class="card-body">
+                                <h5 class="card-title">Pressione</h5>
+                                <h4>{{inmate.vitalSigns.bloodMinPressure}}/{{inmate.vitalSigns.bloodMaxPressure}} mmHg</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-2 card vital-sign-card">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-sm-auto">
-                        <img class="card-img vital-sign-card-icon" src="/assets/images/bpm.png">
-                    </div>
-                    <div class="col-sm-auto">
-                        <div class="card-body">
-                            <h5 class="card-title">Battito cardiaco</h5>
-                            <h4>{{inmate.vitalSigns.bpm}} BPM</h4>
+            <div class="col-2 ">
+                <div class="card vital-sign-card">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-sm-auto">
+                            <img class="card-img vital-sign-card-icon" src="/assets/images/bpm.png">
+                        </div>
+                        <div class="col-sm-auto">
+                            <div class="card-body">
+                                <h5 class="card-title">Battito cardiaco</h5>
+                                <h4>{{inmate.vitalSigns.bpm}} BPM</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="col-2 card vital-sign-card">
-                <div class="row no-gutters align-items-center">
-                    <div class="col-sm-auto">
-                        <img class="card-img vital-sign-card-icon" src="/assets/images/body_temperature.png">
-                    </div>
-                    <div class="col-sm-auto">
-                        <div class="card-body">
-                            <h5 class="card-title">Temperatura</h5>
-                            <h4>{{inmate.vitalSigns.bodyTemperature}} C°</h4>
+            <div class="col-2 ">
+                <div class="card vital-sign-card">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-sm-auto">
+                            <img class="card-img vital-sign-card-icon" src="/assets/images/body_temperature.png">
+                        </div>
+                        <div class="col-sm-auto">
+                            <div class="card-body">
+                                <h5 class="card-title">Temperatura</h5>
+                                <h4>{{inmate.vitalSigns.bodyTemperature}} C°</h4>
+                            </div>
                         </div>
                     </div>
                 </div>

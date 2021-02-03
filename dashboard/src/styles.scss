@@ -11,14 +11,21 @@
 }
 
 .vital-sign-card {
-    min-width: 18rem;
-    max-width: 22rem;
+    width: 18rem;
     height: 7rem;
 }
 
 .vital-sign-card-icon {
     width: 60px;
     height: 60px;
+    margin-left: 15px;
+}
+
+.inmate-card-image {
+  border: 1px solid lightgray; 
+  width: 110px;
+  height: 110px;
+  margin-left: 15px;
 }
 
 .chart-icon {
@@ -27,8 +34,7 @@
     margin-right: 1rem;
 }
 
-html, body 
-{
+html, body {
     height: 100%; 
 }
 
