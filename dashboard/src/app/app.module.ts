@@ -23,6 +23,16 @@ import { InmatePressureChartComponent } from './inmate-pressure-chart/inmate-pre
 import { DatePipe } from '@angular/common';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { NavigationComponent } from './navigation/navigation.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { RoomNavItemComponent } from './room-nav-item/room-nav-item.component';
+import { BedNavItemComponent } from './bed-nav-item/bed-nav-item.component'
 
 @NgModule({
   declarations: [
@@ -42,7 +52,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     InmateOxygenationChartComponent,
     InmateBpmChartComponent,
     InmatePressureChartComponent,
-    SidebarComponent
+    SidebarComponent,
+    NavigationComponent,
+    RoomNavItemComponent,
+    BedNavItemComponent
   ],
   imports: [
     BrowserModule,
@@ -52,6 +65,13 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
       echarts: () => import('echarts')
     }),
     NgbModule,
+    BrowserAnimationsModule,
+    MatListModule,
+    MatSidenavModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent]

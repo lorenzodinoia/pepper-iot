@@ -1,0 +1,20 @@
+<mat-toolbar color="primary" style="font: inherit;">
+  <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()" *ngIf="isHandset$ | async">
+    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+  </button>
+  <a class="navbar-brand" routerLink="home" style="color: inherit;">Pepper4RSA</a>
+</mat-toolbar>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
+    <mat-nav-list *ngIf="rooms">
+      <room-nav-item></room-nav-item>
+      <a mat-list-item routerLink="/home"><mat-icon mat-list-icon class="material-icons-outlined">home</mat-icon>Home</a>
+      <hr>
+      <room-nav-item *ngFor="let room of rooms" [room]="room"></room-nav-item>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <br>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
