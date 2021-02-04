@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
+
 public class Emergency extends Model{
 
     private int type;
@@ -15,6 +17,7 @@ public class Emergency extends Model{
     @SerializedName("vital_signs")
     private VitalData vitalSigns;
     private String bedLabel;
+    private String tags;
 
     public Emergency(){
 
@@ -39,6 +42,7 @@ public class Emergency extends Model{
         this.envData = in.readParcelable(EnvData.class.getClassLoader());
         this.vitalSigns = in.readParcelable(VitalData.class.getClassLoader());
         this.bedLabel = in.readString();
+        this.tags = in.readString();
     }
 
     @Override
@@ -49,6 +53,7 @@ public class Emergency extends Model{
         dest.writeParcelable(this.envData, flags);
         dest.writeParcelable(this.vitalSigns, flags);
         dest.writeString(this.bedLabel);
+        dest.writeString(this.tags);
     }
 
     public int getType() {
@@ -89,5 +94,13 @@ public class Emergency extends Model{
 
     public void setBedLabel(String bedLabel) {
         this.bedLabel = bedLabel;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

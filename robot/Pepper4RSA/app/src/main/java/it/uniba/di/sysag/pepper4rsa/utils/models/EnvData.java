@@ -14,6 +14,15 @@ public class EnvData extends Model{
 
     }
 
+    public static final class Thresholds {
+        public static final int MIN_LUX = 401;
+        public static final int MAX_LUX = 1000;
+        public static final float MAX_VOC = 0.7f;
+        public static final int MIN_DEGREE = 15;
+        public static final int MAX_DEGREE = 30;
+        public static final int MAX_HUMIDITY = 60;
+    }
+
     public static final Creator<EnvData> CREATOR = new Creator<EnvData>() {
         @Override
         public EnvData createFromParcel(Parcel in) {

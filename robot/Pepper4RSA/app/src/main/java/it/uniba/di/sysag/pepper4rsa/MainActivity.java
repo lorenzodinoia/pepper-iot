@@ -16,6 +16,7 @@ import com.aldebaran.qi.sdk.builder.ChatBuilder;
 import com.aldebaran.qi.sdk.builder.QiChatbotBuilder;
 import com.aldebaran.qi.sdk.builder.TopicBuilder;
 import com.aldebaran.qi.sdk.design.activity.RobotActivity;
+import com.aldebaran.qi.sdk.design.activity.conversationstatus.SpeechBarDisplayStrategy;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.conversation.Chat;
@@ -27,6 +28,8 @@ import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Stack;
 import java.util.TreeMap;
 
 import it.uniba.di.sysag.pepper4rsa.utils.map.LocalizeAndMapHelper;
@@ -51,8 +54,11 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setSpeechBarDisplayStrategy(SpeechBarDisplayStrategy.IMMERSIVE);
         Providers.init(getApplicationContext());
         setContentView(R.layout.activity_main);
+
 
         //Check android permission
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -76,29 +82,8 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
         try {
             loadLocations();
-            /*MainFragment mainFragment = new MainFragment();
-            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();*/
-            robotHelper.say("Hello, what's your name?");
-            Topic topic = TopicBuilder.with(qiContext)
-                    .withResource(R.raw.greetings)
-                    .build();
-            QiChatbot qiChatbot = QiChatbotBuilder.with(qiContext)
-                    .withTopic(topic)
-                    .build();
-
-            chat = ChatBuilder.with(qiContext)
-                    .withChatbot(qiChatbot)
-                    .build();
-
-            chat.addOnStartedListener(() -> Log.d(CONSOLE_TAG, "Discussion started"));
-
-            Future<Void> chatFuture = chat.async().run();
-            chatFuture.thenConsume(value -> {
-                if(value.hasError()){
-                    Log.d(CONSOLE_TAG, "Discussion finished with error.", value.getError());
-                }
-            });
-
+            MainFragment mainFragment = new MainFragment();
+            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -109,9 +94,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     @Override
     public void onRobotFocusLost() {
 
-        if(chat != null){
-            chat.removeAllOnStartedListeners();
-        }
     }
 
     @Override
@@ -208,5 +190,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     }
 
     public void setLocalized(boolean localized) { this.localized = localized;}
+
+
 
 }

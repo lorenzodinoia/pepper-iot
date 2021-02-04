@@ -18,21 +18,34 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.aldebaran.qi.Consumer;
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
+import com.aldebaran.qi.sdk.builder.AnimateBuilder;
+import com.aldebaran.qi.sdk.builder.AnimationBuilder;
 import com.aldebaran.qi.sdk.builder.ApproachHumanBuilder;
+import com.aldebaran.qi.sdk.builder.ChatBuilder;
 import com.aldebaran.qi.sdk.builder.LookAtBuilder;
+import com.aldebaran.qi.sdk.builder.QiChatbotBuilder;
+import com.aldebaran.qi.sdk.builder.TopicBuilder;
+import com.aldebaran.qi.sdk.object.actuation.Animate;
+import com.aldebaran.qi.sdk.object.actuation.Animation;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.actuation.LookAt;
 import com.aldebaran.qi.sdk.object.actuation.LookAtMovementPolicy;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
+import com.aldebaran.qi.sdk.object.conversation.Chat;
+import com.aldebaran.qi.sdk.object.conversation.QiChatbot;
+import com.aldebaran.qi.sdk.object.conversation.Topic;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
 import com.aldebaran.qi.sdk.object.human.Human;
 import com.aldebaran.qi.sdk.object.humanawareness.ApproachHuman;
 import com.aldebaran.qi.sdk.object.humanawareness.HumanAwareness;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
+import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
@@ -44,6 +57,7 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.GoToHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.PointsOfInterestView;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Emergency;
+import it.uniba.di.sysag.pepper4rsa.utils.models.EnvData;
 import it.uniba.di.sysag.pepper4rsa.utils.request.EmergencyRequest;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
@@ -71,7 +85,20 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private List<PointF> poiPositions;
     private String label;
 
+    private Chat chat;
+    private Stack<Integer> topics = new Stack<>();
+
     private Boolean atMapFrame = false;
+
+    public static final HashMap<String, Integer> topicsMap = new HashMap<>();
+    static{
+        topicsMap.put("lux-", R.raw.greetings);
+        topicsMap.put("lux+", R.raw.greetings);
+        topicsMap.put("voc+", R.raw.greetings);
+        topicsMap.put("degree-", R.raw.greetings);
+        topicsMap.put("degree+", R.raw.greetings);
+        topicsMap.put("humidity+", R.raw.greetings);
+    }
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -184,7 +211,6 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
      * Init the listeners for robot movement
      */
     private void registerListener(){
-        //TODO set listener
         robotHelper.goToHelper.addOnStartedMovingListener(() -> mainActivity.runOnUiThread(() -> {
             Log.d(MainActivity.CONSOLE_TAG, "Movement started");
             mainActivity.runOnUiThread(() -> {
@@ -210,35 +236,24 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 gotoLoader.setVisibility(View.GONE);
             });
 
-            if(goToStatus == GoToHelper.GoToStatus.FINISHED){
-                Log.d(MainActivity.CONSOLE_TAG, "Navigation Finished");
-                if (emergencyListener == null) {
-                    emergencyListener = NavigationFragment.this;
-                    /*
-                    if (!label.equals(MAP_FRAME)) {
-                        lookForHumans(new LookAtListener() {
-                            @Override
-                            public void onLookAtSuccess() {
-                                robotHelper.say("Ciao Lorenzo");
-                                //futureLookAt.requestCancellation();
-                                //TODO add chat
-                                if (emergency != null) {
-                                    emergencyListener.onEmergencyHandled();
-                                }
+            if(goToStatus == GoToHelper.GoToStatus.FINISHED) {
+                robotHelper.releaseAbilities().andThenConsume(value -> {
+                    Log.d(MainActivity.CONSOLE_TAG, "Navigation Finished");
+                    if (emergencyListener == null) {
+                        emergencyListener = NavigationFragment.this;
+                        //TODO add chat
+                        if(emergency != null) {
+                            createStack(emergency);
+                            if(!topics.empty()) {
+                                handleTopics(topics.pop());
                             }
+                        }
 
-                            @Override
-                            public void onLookAtFail() {
-
-                            }
-
-                            @Override
-                            public void onNoHumansDetected() {
-
-                            }
-                        });
-                    }*/
-                }
+                        if (emergency != null) {
+                            emergencyListener.onEmergencyHandled();
+                        }
+                    }
+                });
             }
             else if(goToStatus == GoToHelper.GoToStatus.CANCELLED){
                 Log.d(MainActivity.CONSOLE_TAG, "Navigation Cancelled");
@@ -313,6 +328,76 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             public void errorResponse(RequestException error) {
                 Log.d(MainActivity.CONSOLE_TAG, "SetAdDone failed");
                 //emergencyListener = NavigationFragment.this;
+            }
+        });
+    }
+
+    private void createStack(Emergency emergency){
+        topics.clear();
+        //TODO Add conclusion
+        topics.push(R.raw.greetings);
+
+        switch (emergency.getType()) {
+            case 0:
+                String tags = emergency.getTags();
+                StringTokenizer stringTokenizer = new StringTokenizer(tags, ";");
+                while (stringTokenizer.hasMoreTokens()){
+                    String tag = stringTokenizer.nextToken();
+                    if(topicsMap.containsKey(tag)){
+                        topics.push(topicsMap.get(tag));
+                    }
+                }
+                break;
+            case 1:
+                //TODO change
+                topics.push(R.raw.greetings);
+                break;
+            case 2:
+                //TODO change
+                topics.push(R.raw.greetings);
+                break;
+            case 3:
+                //TODO change
+                topics.push(R.raw.greetings);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void handleTopics(int topicToHandle){
+        Topic topic = TopicBuilder.with(qiContext)
+                .withResource(topicToHandle)
+                .build();
+
+        QiChatbot qiChatbot = QiChatbotBuilder.with(qiContext)
+                .withTopic(topic)
+                .build();
+
+        chat = ChatBuilder.with(qiContext)
+                .withChatbot(qiChatbot)
+                .build();
+
+        chat.addOnStartedListener(() -> {
+            Log.d(MainActivity.CONSOLE_TAG, "Discussion started");
+            if (chat != null) {
+                chat.removeAllOnStartedListeners();
+            }
+        });
+
+        Future<Void> chatFuture = chat.async().run();
+
+        qiChatbot.addOnEndedListener(endReason -> {
+            robotHelper.releaseAbilities();
+            chatFuture.requestCancellation();
+            if(!topics.empty()){
+                handleTopics(topics.pop());
+            }
+        });
+
+        chatFuture.thenConsume(valuex -> {
+            if (valuex.hasError()) {
+                Log.d(MainActivity.CONSOLE_TAG, "Discussion finished with error.", valuex.getError());
             }
         });
     }
