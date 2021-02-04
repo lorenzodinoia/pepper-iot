@@ -16,6 +16,10 @@ export class RoomHumidityChartComponent implements OnInit {
   constructor(private _client: Client) { }
 
   ngOnInit(): void {
+    this.getLatest24Hours();    
+  }
+
+  private getLatest24Hours(): void {
     this._client.httpClient.get(`${Client.SERVER_URL}/env_data/series/?room_id=${this.id}&field=humidity`, Client.OPTIONS).pipe(map((response: any) => {
       return response;
     })).subscribe((response) => {
@@ -30,13 +34,15 @@ export class RoomHumidityChartComponent implements OnInit {
       }
 
       if (values.length != 0) {
-        this.setData(hours, values);
+        this.setData(hours, values, true);
       }
-    });    
+    });   
   }
 
-  private setData(hours: Array<string>, values: Array<number>): void {
-    this.latest = values[values.length - 1];
+  private setData(hours: Array<string>, values: Array<number>, changeLatest: boolean = false): void {
+    if (changeLatest) {
+      this.latest = values[values.length - 1];
+    }
 
     this.chartOptions = {
       tooltip: {
@@ -77,5 +83,32 @@ export class RoomHumidityChartComponent implements OnInit {
         }
       ]
     };
+  }
+
+  public getfromInterval(start: Date, end: Date): void {
+    let startAsString: string = start.toISOString();
+    let endAsString: string = end.toISOString();
+    
+    this._client.httpClient.get(`${Client.SERVER_URL}/env_data/series/?room_id=${this.id}&field=humidity&start=${startAsString}&end=${endAsString}`, Client.OPTIONS).pipe(map((response: any) => {
+      return response;
+    })).subscribe((response) => {
+      let hours: Array<string> = [];
+      let values: Array<number> = [];
+      let valuesJson: any = response["values"];
+
+      for (let index in valuesJson) {
+        let item: any = valuesJson[index];
+        hours.push(item["hour"]);
+        values.push(item["value"]);
+      }
+
+      if (values.length != 0) {
+        this.setData(hours, values, true);
+      }
+    });   
+  }
+
+  public reset(): void {
+    this.getLatest24Hours();
   }
 }

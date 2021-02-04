@@ -1,0 +1,5 @@
+<div *ngIf="bed" style="margin-left: 30px;">
+    <a mat-list-item [routerLink]="['/inmate', bed.inmate.id]">
+        <mat-icon mat-list-icon class="material-icons-outlined">bed</mat-icon>{{bed.inmate.name}} {{bed.inmate.surname}}
+    </a>
+</div>

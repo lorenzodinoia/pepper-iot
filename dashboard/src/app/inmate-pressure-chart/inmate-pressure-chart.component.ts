@@ -16,6 +16,10 @@ export class InmatePressureChartComponent implements OnInit {
   constructor(private _client: Client) { }
 
   ngOnInit(): void {
+    this.getLatest24Hours();
+  }
+
+  private getLatest24Hours(): void {
     this._client.httpClient.get(`${Client.SERVER_URL}/vital_signs/series/?inmate_id=${this.id}&field=pressure`, Client.OPTIONS).pipe(map((response: any) => {
       return response;
     })).subscribe((response) => {
@@ -32,16 +36,18 @@ export class InmatePressureChartComponent implements OnInit {
       }
 
       if (minValues.length != 0) {
-        this.setData(hours, minValues, maxValues);
+        this.setData(hours, minValues, maxValues, true);
       }
     });
   }
 
-  private setData(hours: Array<string>, minValues: Array<number>, maxValues: Array<number>): void {
-    let minLatest: number = minValues[minValues.length - 1];
-    let maxLatest: number = maxValues[maxValues.length - 1];
-    this.latest = `${minLatest}/${maxLatest}`;
-
+  private setData(hours: Array<string>, minValues: Array<number>, maxValues: Array<number>, changeLatest: boolean = false): void {
+    if (changeLatest) {
+      let minLatest: number = minValues[minValues.length - 1];
+      let maxLatest: number = maxValues[maxValues.length - 1];
+      this.latest = `${minLatest}/${maxLatest}`;
+    }
+    
     this.chartOptions = {
       tooltip: {
         show: true
@@ -90,4 +96,32 @@ export class InmatePressureChartComponent implements OnInit {
     };
   }
 
+  public getfromInterval(start: Date, end: Date): void {
+    let startAsString: string = start.toISOString();
+    let endAsString: string = end.toISOString();
+    
+    this._client.httpClient.get(`${Client.SERVER_URL}/vital_signs/series/?inmate_id=${this.id}&field=pressure&start=${startAsString}&end=${endAsString}`, Client.OPTIONS).pipe(map((response: any) => {
+      return response;
+    })).subscribe((response) => {
+      let hours: Array<string> = [];
+      let minValues: Array<number> = [];
+      let maxValues: Array<number> = [];
+      let valuesJson: any = response["values"];
+
+      for (let index in valuesJson) {
+        let item: any = valuesJson[index];
+        hours.push(item["hour"]);
+        minValues.push(item["value_min"]);
+        maxValues.push(item["value_max"]);
+      }
+
+      if (minValues.length != 0) {
+        this.setData(hours, minValues, maxValues);
+      }
+    });   
+  }
+
+  public reset(): void {
+    this.getLatest24Hours();
+  }
 }
