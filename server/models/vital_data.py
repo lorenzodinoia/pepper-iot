@@ -102,8 +102,8 @@ class Vital_data:
                         emergency_flag = True
                 
                 if(emergency_flag):
-                    emergency_obj = Emergency(None, None, None, None, None, None, None, None)
-                    data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id, "bed_id" : bed_id}
+                    emergency_obj = Emergency(None, None, None, None, None, None, None, None, None)
+                    data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id, "bed_id" : bed_id, "tags": ""}
                     value = emergency_obj.add_emergency(data)
                     if(value != 200):
                         return 500
