@@ -83,7 +83,7 @@ class Room:
 
             #Create bed collection for each room
             rooms = []
-            i=0
+            print(room_list)
             for room in room_list:
                 inmate = {'id': room['inmate_id'], 'name': room['name'], 'surname': room['surname']}
                 bed = {'id': room['bed_id'], 'inmate': inmate}

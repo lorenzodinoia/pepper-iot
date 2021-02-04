@@ -45,16 +45,23 @@ public class MainFragment extends Fragment {
         buttonStartService = view.findViewById(R.id.buttonStartService);
 
         robotHelper.localizeAndMapHelper.addOnFinishedLocalizingListener(result -> {
-            robotHelper.say("Localization finished");
             robotHelper.releaseAbilities();
             mainActivity.runOnUiThread(() -> {
                 if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
                     robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
+                    robotHelper.say("Localization finished");
                     Log.d(MainActivity.CONSOLE_TAG, "Localized");
+                    mainActivity.setLocalized(true);
+                    buttonStartService.setEnabled(true);
+                    buttonStartService.setAlpha(1);
+                    buttonStartService.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_goto_frame, 0, 0);
+                    buttonStartLocalize.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_localize_robot_burgermenu_oklocation, 0, 0);
                 } else if (result == LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING) {
                     robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
+                    robotHelper.say("Map missing");
                     Log.d(MainActivity.CONSOLE_TAG, "Map_Missing");
                 } else if (result == LocalizeAndMapHelper.LocalizationStatus.FAILED) {
+                    robotHelper.say("Localization failed");
                     Log.d(MainActivity.CONSOLE_TAG, "Failed");
                 } else {
                     Log.d(MainActivity.CONSOLE_TAG, "onViewCreated: Unable to localize in Map");
@@ -63,27 +70,21 @@ public class MainFragment extends Fragment {
         });
 
         buttonStartLocalize.setOnClickListener(v -> {
-            if(!robotHelper.askToCloseIfFlapIsOpened()){
+            if(robotHelper.askToCloseIfFlapIsOpened()){
                 Log.d(MainActivity.CONSOLE_TAG, "Flat opened");
             }
             else {
                 Log.d(MainActivity.CONSOLE_TAG, "Localize Button");
                 mainActivity.startLocalizing();
-                mainActivity.setLocalized(true);
-                buttonStartService.setEnabled(true);
-                buttonStartService.setAlpha(1);
-                buttonStartService.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_goto_frame, 0, 0);
-                buttonStartLocalize.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_localize_robot_burgermenu_oklocation, 0, 0);
             }
         });
 
         buttonStartService.setOnClickListener(v -> {
-            if(!robotHelper.askToCloseIfFlapIsOpened()){
+            if(robotHelper.askToCloseIfFlapIsOpened()){
                 Log.d(MainActivity.CONSOLE_TAG, "Flat opened");
             }
             else{
                 if(mainActivity.isLocalized()) {
-                    //TODO indirizzare all'activity per la routine di pepper
                     Log.d(MainActivity.CONSOLE_TAG, "Start Service Button");
                     NavigationFragment navigationFragment = new NavigationFragment();
                     mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();

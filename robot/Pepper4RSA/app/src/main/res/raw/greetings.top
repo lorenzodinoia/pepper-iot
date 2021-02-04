@@ -1,0 +1,6 @@
+topic: ~greetings()
+# Defining extra concepts out of words or group of words
+concept:(hello) ^rand[hello hi hey "good morning" greetings]
+concept:(approach) ^rand[]
+# Replying to speech
+u:(~hello) ~hello, what do you want?

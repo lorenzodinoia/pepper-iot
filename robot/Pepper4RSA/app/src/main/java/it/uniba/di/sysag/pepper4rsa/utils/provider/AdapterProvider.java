@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import it.uniba.di.sysag.pepper4rsa.utils.adapter.Adapter;
+import it.uniba.di.sysag.pepper4rsa.utils.models.Emergency;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Model;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Room;
 
@@ -13,6 +14,7 @@ public final class AdapterProvider {
 
     static {
         adapters.put(Room.class, new Adapter<Room>());
+        adapters.put(Emergency.class, new Adapter<Emergency>());
     }
 
     public static <T extends Model> Adapter<T> getAdapterFor(Class<T> modelClass) {

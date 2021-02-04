@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class Room extends Model{
 
-    @SerializedName("name_room")
     private String name;
 
     public static final Creator<Room> CREATOR = new Creator<Room>() {

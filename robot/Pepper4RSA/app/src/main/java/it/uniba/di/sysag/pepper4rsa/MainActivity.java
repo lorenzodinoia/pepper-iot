@@ -8,35 +8,34 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
 import com.aldebaran.qi.sdk.QiSDK;
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks;
+import com.aldebaran.qi.sdk.builder.ChatBuilder;
+import com.aldebaran.qi.sdk.builder.QiChatbotBuilder;
+import com.aldebaran.qi.sdk.builder.TopicBuilder;
 import com.aldebaran.qi.sdk.design.activity.RobotActivity;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
+import com.aldebaran.qi.sdk.object.conversation.Chat;
+import com.aldebaran.qi.sdk.object.conversation.QiChatbot;
+import com.aldebaran.qi.sdk.object.conversation.Topic;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
 import com.aldebaran.qi.sdk.object.streamablebuffer.StreamableBuffer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import it.uniba.di.sysag.pepper4rsa.utils.map.LocalizeAndMapHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.SaveFileHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.Vector2theta;
-import it.uniba.di.sysag.pepper4rsa.utils.models.Room;
 import it.uniba.di.sysag.pepper4rsa.utils.provider.Providers;
-import it.uniba.di.sysag.pepper4rsa.utils.request.RoomRequest;
-import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
-import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
 
-public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks, NavigationListener {
+public class MainActivity extends RobotActivity implements RobotLifecycleCallbacks {
     public static final String CONSOLE_TAG = "Pepper4RSA";
     private static final int PERMISSION_STORAGE = 1;
 
@@ -45,10 +44,9 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     private RobotHelper robotHelper;
 
     private TreeMap<String, AttachedFrame> savedLocations;
-
-    private NavigationFragment navigationFragment;
-
     private boolean localized;
+
+    private Chat chat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,30 +76,28 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
         try {
             loadLocations();
-
-            //TODO aggiungere logica di get delle emergenze
-            /*Bundle bundle = new Bundle();
-            bundle.putString(NavigationFragment.ARG_LABEL_FRAME, "Gioconda");
-            navigationFragment = new NavigationFragment();
-            navigationFragment.setArguments(bundle);
-            this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();*/
             /*MainFragment mainFragment = new MainFragment();
             this.getSupportFragmentManager().beginTransaction().add(R.id.frame_fragment, mainFragment).addToBackStack(null).commit();*/
-            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-            scheduledExecutorService.scheduleAtFixedRate((Runnable) () -> {
-                RoomRequest roomRequest = new RoomRequest();
-                roomRequest.readAll(new RequestListener<Collection<Room>>() {
-                    @Override
-                    public void successResponse(Collection<Room> response) {
-                        Log.d(MainActivity.CONSOLE_TAG, "Success");
-                    }
+            robotHelper.say("Hello, what's your name?");
+            Topic topic = TopicBuilder.with(qiContext)
+                    .withResource(R.raw.greetings)
+                    .build();
+            QiChatbot qiChatbot = QiChatbotBuilder.with(qiContext)
+                    .withTopic(topic)
+                    .build();
 
-                    @Override
-                    public void errorResponse(RequestException error) {
-                        Log.d(MainActivity.CONSOLE_TAG, "Error");
-                    }
-                });
-            }, 0, 2, TimeUnit.MINUTES);
+            chat = ChatBuilder.with(qiContext)
+                    .withChatbot(qiChatbot)
+                    .build();
+
+            chat.addOnStartedListener(() -> Log.d(CONSOLE_TAG, "Discussion started"));
+
+            Future<Void> chatFuture = chat.async().run();
+            chatFuture.thenConsume(value -> {
+                if(value.hasError()){
+                    Log.d(CONSOLE_TAG, "Discussion finished with error.", value.getError());
+                }
+            });
 
         }
         catch (FileNotFoundException e) {
@@ -113,6 +109,9 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     @Override
     public void onRobotFocusLost() {
 
+        if(chat != null){
+            chat.removeAllOnStartedListeners();
+        }
     }
 
     @Override
@@ -177,26 +176,6 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
         return savedLocations;
     }
 
-    @Override
-    public void onNavigationStarted() {
-
-    }
-
-    @Override
-    public void onNavigationFinished() {
-
-    }
-
-    @Override
-    public void onNavigationCancelled() {
-
-    }
-
-    @Override
-    public void onNavigationFailed() {
-
-    }
-
     public SaveFileHelper getSaveFileHelper() {
         return saveFileHelper;
     }
@@ -229,4 +208,5 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     }
 
     public void setLocalized(boolean localized) { this.localized = localized;}
+
 }
