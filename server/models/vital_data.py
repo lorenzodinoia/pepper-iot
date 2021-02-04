@@ -6,6 +6,7 @@ from flask import request
 from flask import jsonify
 from flask import abort
 from models.emergency import Emergency
+from models.bed import Bed
 
 
 MIN_BPM = 60
@@ -31,7 +32,7 @@ class Vital_data:
         self.inmate_id = inmate_id
 
     def add_data(self, data):
-        print(data)
+        bed_id = None
         if(data is not None):
             self.bpm = 0
             self.body_temperature = 0
@@ -49,61 +50,67 @@ class Vital_data:
                 self.max_body_pressure = data["max_body_pressure"]
             if("blood_oxygenation" in data):
                 self.blood_oxygenation = data["blood_oxygenation"]
-            if("inmate_id" in data):
-                self.inmate_id = data["inmate_id"]
+            if("bed_id" in data):
+                bed_id = data["bed_id"]
             else:
                 return 400
 
-            mydb = None
-            try:
-                mydb = mysql.connector.connect(
-                    user = os.getenv("DATABASE_USER"),
-                    database = os.getenv("DATABASE_NAME"),
-                    password = os.getenv("DATABASE_PASSWORD")
-                )
-                cursor = mydb.cursor()
+            bed_obj = Bed(None, None, None)
+            bed = bed_obj.get_bed(bed_id)
+            if(bed is not None):
+                self.inmate_id = bed[0]["inmate_id"]
+                mydb = None
+                try:
+                    mydb = mysql.connector.connect(
+                        user = os.getenv("DATABASE_USER"),
+                        database = os.getenv("DATABASE_NAME"),
+                        password = os.getenv("DATABASE_PASSWORD")
+                    )
+                    cursor = mydb.cursor()
 
-                val = (self.bpm, self.body_temperature, self.min_body_pressure, self.max_body_pressure, self.blood_oxygenation, self.inmate_id)
-                sql = ("""INSERT INTO vital_signs (tmstp, bpm, body_temperature, min_body_pressure, max_body_pressure, blood_oxygenation, inmate_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d, %d)""" % val)
-                cursor.execute(sql)
-                mydb.commit()
+                    val = (self.bpm, self.body_temperature, self.min_body_pressure, self.max_body_pressure, self.blood_oxygenation, self.inmate_id)
+                    sql = ("""INSERT INTO vital_signs (tmstp, bpm, body_temperature, min_body_pressure, max_body_pressure, blood_oxygenation, inmate_id) VALUES (NOW(), %d, %0.1f, %d, %d, %d, %d)""" % val)
+                    cursor.execute(sql)
+                    mydb.commit()
 
-                self.id = cursor.lastrowid
-                    
-            except Exception as e:
-                print(e)
-                return 500
-            finally:
-                if(mydb.is_connected()):
-                    mydb.close()
-                else:
-                    return 400
-            
-            emergency_flag = False
-            if((self.bpm < MIN_BPM) or (self.bpm > MAX_BPM)):
-                if(self.bpm > 0):
-                    emergency_flag = True
-            if((self.body_temperature < MIN_BODY_TEMPERATURE) or (self.body_temperature > MAX_BODY_TEMPERATURE)):
-                if(self.body_temperature > 0):
-                    emergency_flag = True
-            if((self.min_body_pressure < MIN_MIN_BODY_PRESSURE) or (self.min_body_pressure > MAX_MIN_BODY_PRESSURE)):
-                if(self.min_body_pressure > 0):
-                    emergency_flag = True
-            if((self.max_body_pressure < MIN_MAX_BODY_PRESSURE) or (self.max_body_pressure > MAX_MAX_BODY_PRESSURE)):
-                if(self.max_body_pressure > 0):
-                    emergency_flag = True
-            if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
-                if(self.blood_oxygenation > 0):
-                    emergency_flag = True
-            
-            if(emergency_flag):
-                emergency_obj = Emergency(None, None, None, None, None, None, None, None)
-                data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id}
-                value = emergency_obj.add_emergency(data)
-                if(value != 200):
+                    self.id = cursor.lastrowid
+                        
+                except Exception as e:
+                    print(e)
                     return 500
+                finally:
+                    if(mydb.is_connected()):
+                        mydb.close()
+                    else:
+                        return 400
+                
+                emergency_flag = False
+                if((self.bpm < MIN_BPM) or (self.bpm > MAX_BPM)):
+                    if(self.bpm > 0):
+                        emergency_flag = True
+                if((self.body_temperature < MIN_BODY_TEMPERATURE) or (self.body_temperature > MAX_BODY_TEMPERATURE)):
+                    if(self.body_temperature > 0):
+                        emergency_flag = True
+                if((self.min_body_pressure < MIN_MIN_BODY_PRESSURE) or (self.min_body_pressure > MAX_MIN_BODY_PRESSURE)):
+                    if(self.min_body_pressure > 0):
+                        emergency_flag = True
+                if((self.max_body_pressure < MIN_MAX_BODY_PRESSURE) or (self.max_body_pressure > MAX_MAX_BODY_PRESSURE)):
+                    if(self.max_body_pressure > 0):
+                        emergency_flag = True
+                if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
+                    if(self.blood_oxygenation > 0):
+                        emergency_flag = True
+                
+                if(emergency_flag):
+                    emergency_obj = Emergency(None, None, None, None, None, None, None, None, None)
+                    data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id, "bed_id" : bed_id, "tags": ""}
+                    value = emergency_obj.add_emergency(data)
+                    if(value != 200):
+                        return 500
 
-            return 200
+                return 200
+            else:
+                return 400
         else:
             return 500
     

@@ -66,20 +66,30 @@ class Environmental_data:
                     mydb.close()
             
             emergency_flag = False
-            if((self.lux < MIN_LUX) or (self.lux > MAX_LUX)):
-                if(self.lux > 0):
-                    emergency_flag = True
-            if(self.voc > MAX_VOC):
+            emergency_string = []
+            if ((self.lux < MIN_LUX) and (self.lux > 0)):
                 emergency_flag = True
-            if((self.degree < MIN_DEGREE) or (self.degree > MAX_DEGREE)):
-                if(self.degree > 0):
-                    emergency_flag = True
-            if(self.humidity < MAX_DEGREE):
+                emergency_string.append("lux-")
+            if (self.lux > MAX_LUX):
                 emergency_flag = True
+                emergency_string.append("lux+")
+            if (self.voc > MAX_VOC):
+                emergency_flag = True
+                emergency_string.append("voc+")
+            if (self.humidity > MAX_HUMIDITY):
+                emergency_flag = True
+                emergency_string.append("humidity+")
+            if ((self.degree < MIN_DEGREE) and (self.degree > 0)):
+                emergency_flag = True
+                emergency_string.append("degree-")
+            if (self.degree > MAX_DEGREE):
+                emergency_flag = True
+                emergency_string.append("degree+")
 
             if(emergency_flag):
-                emergency_obj = Emergency(None, None, None, None, None, None, None, None)
-                data = {"level_em" : 0, "type_em" : 0, "env_data_id" : self.id}
+                tags = ';'.join(emergency_string)
+                emergency_obj = Emergency(None, None, None, None, None, None, None, None, None)
+                data = {"level_em" : 0, "type_em" : 0, "env_data_id" : self.id, "tags": tags}
                 value = emergency_obj.add_emergency(data)
                 if(value != 200):
                     return 500

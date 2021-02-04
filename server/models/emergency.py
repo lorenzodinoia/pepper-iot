@@ -17,7 +17,7 @@ type_em indicates the type of emergency. It could be of three different types:
 done indicates if the emergency is already managed or not
 """
 class Emergency:
-    def __init__(self, id : int, tmstp : str, level_em : int, type_em : int, done : bool, env_data_id : int, vital_signs_id : int, bed_id : int):
+    def __init__(self, id : int, tmstp : str, level_em : int, type_em : int, done : bool, env_data_id : int, vital_signs_id : int, bed_id : int, tags: str):
         self.id = id
         self.tmstp = tmstp
         self.level_em = level_em
@@ -26,6 +26,7 @@ class Emergency:
         self.env_data_id = env_data_id
         self.vital_signs_id = vital_signs_id
         self.bed_id = bed_id
+        self.tags = tags
 
     def add_emergency(self, data):
 
@@ -38,6 +39,10 @@ class Emergency:
                 return 400
             if("type_em" in data):
                 self.type_em = data["type_em"]
+            else:
+                return 400
+            if("tags" in data):
+                self.tags = data["tags"]
             else:
                 return 400
             
@@ -54,18 +59,21 @@ class Emergency:
 
                 if(self.type_em == 0):
                     if("env_data_id" in data):
+                        print(self.tags)
                         self.env_data_id = data["env_data_id"]
-                        val = (self.level_em, self.type_em, self.env_data_id)
-                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, env_data_id) VALUES (NOW(), %d, %d, False, %d)""" % val)
+                        val = (self.level_em, self.type_em, self.env_data_id, self.tags)
+                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, env_data_id, tags) VALUES (NOW(), %d, %d, False, %d, "%s")""" % val)
                         cursor.execute(sql)
+                        print("qui")
                         mydb.commit()
                     else: 
                         return 400
                 elif (self.type_em == 1):
-                    if("vital_signs_id" in data):
+                    if("vital_signs_id" in data and "bed_id" in data):
                         self.vital_signs_id = data["vital_signs_id"]
-                        val = (self.level_em, self.type_em, self.vital_signs_id)
-                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id) VALUES (NOW(), %d, %d, False, %d)""" % val)
+                        self.bed_id = data["bed_id"]
+                        val = (self.level_em, self.type_em, self.vital_signs_id, self.bed_id)
+                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id, bed_id) VALUES (NOW(), %d, %d, False, %d, %d)""" % val)
                         cursor.execute(sql)
                         mydb.commit()
                     else:
@@ -266,7 +274,7 @@ emergency_blueprint = Blueprint('emergency', __name__)
 @emergency_blueprint.route("/add", methods=["POST"]) #Add a new emergency
 def add():
     data = request.json
-    emergency = Emergency(None, None, None, None, None, None, None, None)
+    emergency = Emergency(None, None, None, None, None, None, None, None, None)
     value = emergency.add_emergency(data)
     if(value == 200):
         return jsonify(value)
@@ -275,7 +283,7 @@ def add():
 
 @emergency_blueprint.route("/", methods=["GET"]) #Get a list of active emergencies
 def get():
-    emergency = Emergency(None, None, None, None, None, None, None, None)
+    emergency = Emergency(None, None, None, None, None, None, None, None, None)
     value = emergency.get_emergency_list()
     if(value != 500):
         return jsonify(value)
@@ -286,7 +294,7 @@ def get():
 def set_done():
     emergency_id = request.args.get("id", default=None, type=int)
     if(emergency_id is not None):
-        emergency = Emergency(emergency_id, None, None, None, None, None, None, None)
+        emergency = Emergency(emergency_id, None, None, None, None, None, None, None, None)
         value = emergency.set_em_done()
         if (value == 200):
             return jsonify({"message": "Ok"})
@@ -297,7 +305,7 @@ def set_done():
 
 @emergency_blueprint.route("/next", methods=["GET"]) #Get latest emergency
 def get_next():
-    emergency = Emergency(None, None, None, None, None, None, None, None)
+    emergency = Emergency(None, None, None, None, None, None, None, None, None)
     value = emergency.get_next()
     if(value != 500):
         return jsonify(value)
