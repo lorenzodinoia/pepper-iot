@@ -15,11 +15,20 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.aldebaran.qi.Consumer;
+import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
+import com.aldebaran.qi.sdk.builder.ApproachHumanBuilder;
+import com.aldebaran.qi.sdk.builder.LookAtBuilder;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
+import com.aldebaran.qi.sdk.object.actuation.LookAt;
+import com.aldebaran.qi.sdk.object.actuation.LookAtMovementPolicy;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
+import com.aldebaran.qi.sdk.object.human.Human;
+import com.aldebaran.qi.sdk.object.humanawareness.ApproachHuman;
+import com.aldebaran.qi.sdk.object.humanawareness.HumanAwareness;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +61,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
 
     private EmergencyListener emergencyListener;
 
+    private Future<Void> futureLookAt;
     private TextView gotoText;
     private LottieAnimationView gotoLoader;
     private TextView gotoFinishedText;
@@ -59,6 +69,9 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private Frame robotFrame;
     private Frame mapFrame;
     private List<PointF> poiPositions;
+    private String label;
+
+    private Boolean atMapFrame = false;
 
     public NavigationFragment() {
         // Required empty public constructor
@@ -195,23 +208,47 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             mainActivity.runOnUiThread(() -> {
                 gotoText.setVisibility(View.GONE);
                 gotoLoader.setVisibility(View.GONE);
-                if(goToStatus == GoToHelper.GoToStatus.FINISHED){
-                    Log.d(MainActivity.CONSOLE_TAG, "Navigation Finished");
-                    if (emergencyListener == null) {
-                        emergencyListener = NavigationFragment.this;
-                        //TODO add chat
-                        if(emergency != null) {
-                            emergencyListener.onEmergencyHandled();
-                        }
-                    }
-                }
-                else if(goToStatus == GoToHelper.GoToStatus.CANCELLED){
-                    Log.d(MainActivity.CONSOLE_TAG, "Navigation Cancelled");
-                }
-                else{
-                    Log.d(MainActivity.CONSOLE_TAG, "Navigation Failed");
-                }
             });
+
+            if(goToStatus == GoToHelper.GoToStatus.FINISHED){
+                Log.d(MainActivity.CONSOLE_TAG, "Navigation Finished");
+                if (emergencyListener == null) {
+                    emergencyListener = NavigationFragment.this;
+                    /*
+                    if (!label.equals(MAP_FRAME)) {
+                        lookForHumans(new LookAtListener() {
+                            @Override
+                            public void onLookAtSuccess() {
+                                robotHelper.say("Ciao Lorenzo");
+                                //futureLookAt.requestCancellation();
+                                //TODO add chat
+                                if (emergency != null) {
+                                    emergencyListener.onEmergencyHandled();
+                                }
+                            }
+
+                            @Override
+                            public void onLookAtFail() {
+
+                            }
+
+                            @Override
+                            public void onNoHumansDetected() {
+
+                            }
+                        });
+                    }*/
+                }
+            }
+            else if(goToStatus == GoToHelper.GoToStatus.CANCELLED){
+                Log.d(MainActivity.CONSOLE_TAG, "Navigation Cancelled");
+                robotHelper.say("Navigation Cancelled");
+            }
+            else{
+                Log.d(MainActivity.CONSOLE_TAG, "Navigation Failed");
+                robotHelper.say("Navigation Failed");
+            }
+
             robotHelper.goToHelper.removeOnFinishedMovingListeners();
         });
     }
@@ -222,6 +259,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
      * Send the robot to the desired position.
      */
     public void goToLocation(String locationLabel, AttachedFrame location) {
+        this.label = locationLabel;
         Log.d(MainActivity.CONSOLE_TAG, "goToLocation: " + locationLabel);
         registerListener();
         robotHelper.say("Let's go to " + locationLabel + "!!");
@@ -229,9 +267,12 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             robotHelper.holdAbilities(true);
             if (locationLabel.equalsIgnoreCase(MAP_FRAME)) {
                 robotHelper.goToHelper.goToMapFrame(false, false, OrientationPolicy.FREE_ORIENTATION);
+                atMapFrame = false;
             }
             else {
                 robotHelper.goToHelper.goTo(location, false, false, OrientationPolicy.FREE_ORIENTATION);
+                atMapFrame = true;
+
             }
         });
     }
@@ -250,8 +291,6 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
 
         if(locationLabel != null) {
             AttachedFrame location = savedLocations.get(locationLabel);
-            Log.d(MainActivity.CONSOLE_TAG, "goToLocation: " + locationLabel);
-            robotHelper.say("Let's go to " + locationLabel + "!!");
             if(location != null){
                 goToLocation(locationLabel, location);
             }
@@ -267,18 +306,14 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             @Override
             public void successResponse(Boolean response) {
                 Log.d(MainActivity.CONSOLE_TAG, "SetAdDone success");
-                emergencyListener = NavigationFragment.this;
+                //emergencyListener = NavigationFragment.this;
             }
 
             @Override
             public void errorResponse(RequestException error) {
                 Log.d(MainActivity.CONSOLE_TAG, "SetAdDone failed");
-                emergencyListener = NavigationFragment.this;
+                //emergencyListener = NavigationFragment.this;
             }
         });
-    }
-
-    private void showMap(){
-
     }
 }

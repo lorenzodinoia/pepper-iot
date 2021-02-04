@@ -46,9 +46,9 @@ public class EmergencyAdapter implements JsonDeserializer<Emergency> {
                 emergency.getEnvData().setRoom(room);
                 break;
             case 1:
-
+            case 2:
                 int bedId = jsonObject.get(Keys.BED_ID_KEY).getAsInt();
-                String bedLabel = String.format(Locale.getDefault(), "letto %d", bedId);
+                String bedLabel = String.format(Locale.getDefault(), "Letto %d", bedId);
                 jsonObject.remove(Keys.BED_ID_KEY);
 
                 emergency = emergencyJsonConverter.fromJson(jsonObject.toString(), Emergency.class);
