@@ -75,7 +75,7 @@ class Room:
                 password = os.getenv("DATABASE_PASSWORD")
             )
             cursor = mydb.cursor()
-            cursor.execute("SELECT * FROM room INNER JOIN (SELECT bed.id AS bed_id, bed.inmate_id, inmate.name, inmate.surname, bed.room_id FROM bed INNER JOIN inmate ON bed.inmate_id = inmate.id) AS bed_inmate ON room.id = bed_inmate.room_id")
+            cursor.execute("SELECT * FROM room INNER JOIN (SELECT bed.id AS bed_id, bed.inmate_id, inmate.name, inmate.surname, bed.room_id FROM bed INNER JOIN inmate ON bed.inmate_id = inmate.id) AS bed_inmate ON room.id = bed_inmate.room_id ORDER BY id ASC")
             room_columns = [column[0] for column in cursor.description]
             room_list = []
             for row in cursor.fetchall():
@@ -83,9 +83,11 @@ class Room:
 
             #Create bed collection for each room
             rooms = []
+            i=0
             for room in room_list:
                 inmate = {'id': room['inmate_id'], 'name': room['name'], 'surname': room['surname']}
                 bed = {'id': room['bed_id'], 'inmate': inmate}
+                print(bed)
                 founded_rooms = list(filter(lambda element: element.get('id') == room['id'], rooms))
                 if len(founded_rooms) == 0: #Room doesn't exists
                     room_id = room['id']
@@ -96,10 +98,14 @@ class Room:
                     rooms.append(new_room)
                 else:
                     existing_room = founded_rooms[0]
-                    existing_room['beds'].append(bed)             
+                    existing_room['beds'].append(bed)
+
+            for room in rooms:
+                room["beds"].sort(key=sortById)
 
             return rooms
-        except:
+        except Exception as e:
+            print(e)
             return 500
         finally:
             if(mydb.is_connected()):
@@ -195,3 +201,6 @@ def get():
             return abort(value)
     else:
         return abort(400)
+
+def sortById(e):
+    return e["id"]

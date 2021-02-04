@@ -62,10 +62,11 @@ class Emergency:
                     else: 
                         return 400
                 elif (self.type_em == 1):
-                    if("vital_signs_id" in data):
+                    if("vital_signs_id" in data and "bed_id" in data):
                         self.vital_signs_id = data["vital_signs_id"]
-                        val = (self.level_em, self.type_em, self.vital_signs_id)
-                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id) VALUES (NOW(), %d, %d, False, %d)""" % val)
+                        self.bed_id = data["bed_id"]
+                        val = (self.level_em, self.type_em, self.vital_signs_id, self.bed_id)
+                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id, bed_id) VALUES (NOW(), %d, %d, False, %d, %d)""" % val)
                         cursor.execute(sql)
                         mydb.commit()
                     else:
