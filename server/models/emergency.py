@@ -224,7 +224,7 @@ class Emergency:
 
             emergency_id = emergency_list[0]["id"]
             emergency_type = emergency_list[0]["type_em"]
-            emergency = {"id": emergency_id, "type": emergency_type, "level": emergency_list[0]["level_em"], "tmstp": emergency_list[0]["tmstp"]}
+            emergency = {"id": emergency_id, "type": emergency_type, "level": emergency_list[0]["level_em"], "tags": emergency_list[0]["tags"], "tmstp": emergency_list[0]["tmstp"]}
 
             if emergency_type == 0: #Environmental emergency
                 sql = ("""SELECT environmental_data.*, room.id AS room_id, room.name_room AS room_name FROM emergency INNER JOIN environmental_data ON environmental_data.id = emergency.env_data_id INNER JOIN room ON room.id = environmental_data.room_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
