@@ -1,0 +1,9 @@
+topic: ~final_chat()
+# Defining extra concepts out of words or group of words
+concept:(hello) [hello hi hey "good morning" greetings]
+concept: (otherTask) ^rand["what else can i do for you?" "do you need anything else?"]
+
+# Replying to speech
+u:(~acceptance) ~ok , ~helpTask
+    u1
+u:(~negation) Plesant to help you, ~closure

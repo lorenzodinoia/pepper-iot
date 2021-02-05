@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pepper4RSA</string>
+    <string name="start_exploration">Inizia esplorazione</string>
+
+    <string name="close_charging_flat">Per favore chiudi il flat di ricarica poi dopo avvia l\'azione che desideri eseguire</string>
+
+    <string name="localize">Localizza</string>
+    <string name="start_localizing">Inizio la localizzazione. Per favore allontanati così posso capire meglio dove mi trovo</string>
+    <string name="localization_finished">Localizzazione finita</string>
+    <string name="map_missing">Mappa non trovata</string>
+    <string name="localization_failed">Localizzazione fallita</string>
+
+    <string name="message_server_unreachable" translatable="false">Servizio non disponibile</string>
+    <string name="message_404">L\'elemento non è disponibile</string>
+    <string name="message_500">C\'è un problema su server</string>
+    <string name="message_generic_error">Si è verificato un problema</string>
+
+    <string name="starting_phrase">Perfavore portami al mapFrame prima di localizzarmi e far partire il servizio</string>
+    <string name="localize_before_start_service">Per favore effettua la localizzazione prima di avviare il servizio</string>
+    <string name="back_to_mapFrame">Sto tornando alla base</string>
+
+    <string name="start_service">Avvia servizio</string>
+    <string name="location_reached">Destinazione raggiunta</string>
+    <string name="navigation_cancelled">Navigazione cancellata</string>
+    <string name="navigation_failed">Navigazione fallita</string>
+
+    <string name="goto_text">Mi dirigo verso…</string>
+    <string name="hello">Ciao, inizio conversazione</string>
+</resources>

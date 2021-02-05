@@ -113,6 +113,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
 
     private void init() {
         QiSDK.register(this, this);
+
         this.saveFileHelper = new SaveFileHelper();
         this.robotHelper = new RobotHelper();
     }
@@ -163,7 +164,7 @@ public class MainActivity extends RobotActivity implements RobotLifecycleCallbac
     }
 
     public void startLocalizing() {
-        robotHelper.say("Start localizing");
+        robotHelper.say(getString(R.string.start_localizing));
         if (robotHelper.localizeAndMapHelper.getStreamableMap() == null) {
             StreamableBuffer mapData = getSaveFileHelper().readStreamableBufferFromFile("/sdcard/Maps", "mapData.txt");;
             if (mapData == null) {

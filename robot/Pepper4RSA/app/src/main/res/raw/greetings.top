@@ -1,27 +1,27 @@
 topic: ~greetings()
 
 # Defining extra concepts out of words or group of words
-concept: (hello) ^rand[hello hi hey "good morning" greetings]
-concept: (drugs) ^rand[drugs medicine]
-concept: (drugsType) ^rand[OKI paracetamol]
-concept: (closure) ^rand[bye goodbye "bye bye"]
-concept: (helpTask) ^rand["how can i help you?" "do you need help?" "what can i do for you?"]
-concept: (otherTask) ^rand["what else can i do for you?" "do you need anything else?"]
-concept: (negation) ^rand[no nope none]
-concept: (acceptance) ^rand[yes sure]
+concept: (hello) ^rand[ciao hey "buon giorno" salve]
+concept: (drugs) ^rand[medicine medicinali]
+concept: (drugsType) ^rand[OKI paracetamolo]
+concept: (closure) ^rand[addio arrivederci "buona giornata" "puoi andare {grazie}"]
+concept: (helpTask) ^rand["come posso aiutarti?" "hai bisogno di aiuto?" "cosa posso fare per te?" "hai bisogno di qualcosa?"]
+concept: (otherTask) ^rand["posso fare altro per te?" "ti serve qualcos'altro?"]
+concept: (negation) ^rand[no affatto negativo]
+concept: (acceptance) ^rand[si certo "si, certo"]
 concept: (ok) ^rand[ok]
-concept: (call) ^rand["Call a doctor" "Call a nurse"]
+concept: (call) ^rand["chiama un dottore" "chiama un medico" "chiama un infermiere" "chiama una dottoressa" "chiama una infermiera"]
 
 # Replying to speech
 u:(~hello) ~hello, ~helpTask
-u:(i need my ~drugs) You can take one of ~drugsType . ~otherTask
+u:(ho bisogno di ~drugs) Puoi prendere un ~drugsType . ~otherTask
     u1:(~acceptance) ~ok , ~helpTask
-    u1:(~negation) Plesant to help you, ~closure
+    u1:(~negation) Piacere di averti aiutato, ~closure ^endDiscuss(Closure)
 
 u:(~closure) ~closure ^endDiscuss(Closure)
 
-u:(e:Dialog/NotUnderstood) Sorry, i don't understand, please repeat or ask me to call someone
+u:(e:Dialog/NotUnderstood) Scusa, non ho capito, per favore ripeti o chiedimi di chiamare un dottore
 
 u:(~call) ~ok . ~otherTask
     u1:(~acceptance) ~ok , ~helpTask
-    u1:(~negation) Plesant to help you, ~closure
+    u1:(~negation) Piacere di averti aiutato, ~closure

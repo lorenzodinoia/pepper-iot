@@ -15,30 +15,21 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.aldebaran.qi.Consumer;
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
-import com.aldebaran.qi.sdk.builder.AnimateBuilder;
-import com.aldebaran.qi.sdk.builder.AnimationBuilder;
-import com.aldebaran.qi.sdk.builder.ApproachHumanBuilder;
 import com.aldebaran.qi.sdk.builder.ChatBuilder;
-import com.aldebaran.qi.sdk.builder.LookAtBuilder;
 import com.aldebaran.qi.sdk.builder.QiChatbotBuilder;
 import com.aldebaran.qi.sdk.builder.TopicBuilder;
-import com.aldebaran.qi.sdk.object.actuation.Animate;
-import com.aldebaran.qi.sdk.object.actuation.Animation;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
-import com.aldebaran.qi.sdk.object.actuation.LookAt;
-import com.aldebaran.qi.sdk.object.actuation.LookAtMovementPolicy;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
 import com.aldebaran.qi.sdk.object.conversation.Chat;
 import com.aldebaran.qi.sdk.object.conversation.QiChatbot;
 import com.aldebaran.qi.sdk.object.conversation.Topic;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
-import com.aldebaran.qi.sdk.object.human.Human;
-import com.aldebaran.qi.sdk.object.humanawareness.ApproachHuman;
-import com.aldebaran.qi.sdk.object.humanawareness.HumanAwareness;
+import com.aldebaran.qi.sdk.object.locale.Language;
+import com.aldebaran.qi.sdk.object.locale.Locale;
+import com.aldebaran.qi.sdk.object.locale.Region;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,7 +48,7 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.GoToHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.PointsOfInterestView;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Emergency;
-import it.uniba.di.sysag.pepper4rsa.utils.models.EnvData;
+import it.uniba.di.sysag.pepper4rsa.utils.models.EmergencyMatch;
 import it.uniba.di.sysag.pepper4rsa.utils.request.EmergencyRequest;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
@@ -75,7 +66,6 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
 
     private EmergencyListener emergencyListener;
 
-    private Future<Void> futureLookAt;
     private TextView gotoText;
     private LottieAnimationView gotoLoader;
     private TextView gotoFinishedText;
@@ -86,18 +76,18 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private String label;
 
     private Chat chat;
-    private Stack<Integer> topics = new Stack<>();
+    private Stack<EmergencyMatch> topics = new Stack<>();
 
     private Boolean atMapFrame = false;
 
-    public static final HashMap<String, Integer> topicsMap = new HashMap<>();
+    public static final HashMap<String, EmergencyMatch> topicsMap = new HashMap<>();
     static{
-        topicsMap.put("lux-", R.raw.greetings);
-        topicsMap.put("lux+", R.raw.greetings);
-        topicsMap.put("voc+", R.raw.greetings);
-        topicsMap.put("degree-", R.raw.greetings);
-        topicsMap.put("degree+", R.raw.greetings);
-        topicsMap.put("humidity+", R.raw.greetings);
+        topicsMap.put("lux-", new EmergencyMatch(R.raw.greetings, R.string.hello));
+        topicsMap.put("lux+", new EmergencyMatch(R.raw.greetings, R.string.hello));
+        topicsMap.put("voc+", new EmergencyMatch(R.raw.greetings, R.string.hello));
+        topicsMap.put("degree-", new EmergencyMatch(R.raw.greetings, R.string.hello));
+        topicsMap.put("degree+", new EmergencyMatch(R.raw.greetings, R.string.hello));
+        topicsMap.put("humidity+", new EmergencyMatch(R.raw.greetings, R.string.hello));
     }
 
     public NavigationFragment() {
@@ -216,13 +206,13 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             mainActivity.runOnUiThread(() -> {
                 gotoText.setVisibility(View.VISIBLE);
                 if(emergency == null){
-                    gotoText.setText("Sto tornando alla base");
+                    gotoText.setText(getString(R.string.back_to_mapFrame));
                 }
                 else {
                     if (emergency.getType() == 0) {
-                        gotoText.setText("Mi sto dirigendo verso " + emergency.getEnvData().getRoom().getName());
+                        gotoText.setText(getString(R.string.goto_text) + emergency.getEnvData().getRoom().getName());
                     } else {
-                        gotoText.setText("Mi sto dirigendo verso " + emergency.getBedLabel());
+                        gotoText.setText(getString(R.string.goto_text) + emergency.getBedLabel());
                     }
                 }
                 gotoLoader.setVisibility(View.VISIBLE);
@@ -240,28 +230,23 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 robotHelper.releaseAbilities().andThenConsume(value -> {
                     Log.d(MainActivity.CONSOLE_TAG, "Navigation Finished");
                     if (emergencyListener == null) {
-                        emergencyListener = NavigationFragment.this;
-                        //TODO add chat
                         if(emergency != null) {
                             createStack(emergency);
                             if(!topics.empty()) {
-                                handleTopics(topics.pop());
+                                Thread thread = new Thread(() -> handleTopics(topics.pop()));
+                                thread.start();
                             }
-                        }
-
-                        if (emergency != null) {
-                            emergencyListener.onEmergencyHandled();
                         }
                     }
                 });
             }
             else if(goToStatus == GoToHelper.GoToStatus.CANCELLED){
                 Log.d(MainActivity.CONSOLE_TAG, "Navigation Cancelled");
-                robotHelper.say("Navigation Cancelled");
+                robotHelper.say(getString(R.string.navigation_cancelled));
             }
             else{
                 Log.d(MainActivity.CONSOLE_TAG, "Navigation Failed");
-                robotHelper.say("Navigation Failed");
+                robotHelper.say(getString(R.string.navigation_failed));
             }
 
             robotHelper.goToHelper.removeOnFinishedMovingListeners();
@@ -277,7 +262,6 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
         this.label = locationLabel;
         Log.d(MainActivity.CONSOLE_TAG, "goToLocation: " + locationLabel);
         registerListener();
-        robotHelper.say("Let's go to " + locationLabel + "!!");
         robotHelper.goToHelper.checkAndCancelCurrentGoto().thenConsume(aVoid -> {
             robotHelper.holdAbilities(true);
             if (locationLabel.equalsIgnoreCase(MAP_FRAME)) {
@@ -321,13 +305,11 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             @Override
             public void successResponse(Boolean response) {
                 Log.d(MainActivity.CONSOLE_TAG, "SetAdDone success");
-                //emergencyListener = NavigationFragment.this;
             }
 
             @Override
             public void errorResponse(RequestException error) {
                 Log.d(MainActivity.CONSOLE_TAG, "SetAdDone failed");
-                //emergencyListener = NavigationFragment.this;
             }
         });
     }
@@ -335,14 +317,16 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private void createStack(Emergency emergency){
         topics.clear();
         //TODO Add conclusion
-        topics.push(R.raw.greetings);
+        topics.push(new EmergencyMatch(R.raw.greetings, 0));
 
         switch (emergency.getType()) {
             case 0:
                 String tags = emergency.getTags();
+                Log.d(MainActivity.CONSOLE_TAG, "tags: " + tags);
                 StringTokenizer stringTokenizer = new StringTokenizer(tags, ";");
                 while (stringTokenizer.hasMoreTokens()){
                     String tag = stringTokenizer.nextToken();
+                    Log.d(MainActivity.CONSOLE_TAG, tag);
                     if(topicsMap.containsKey(tag)){
                         topics.push(topicsMap.get(tag));
                     }
@@ -350,32 +334,44 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 break;
             case 1:
                 //TODO change
-                topics.push(R.raw.greetings);
+                //topics.push(R.raw.greetings);
                 break;
             case 2:
                 //TODO change
-                topics.push(R.raw.greetings);
+                //topics.push(R.raw.greetings);
                 break;
             case 3:
                 //TODO change
-                topics.push(R.raw.greetings);
+                //topics.push(R.raw.greetings);
                 break;
             default:
                 break;
         }
     }
 
-    private void handleTopics(int topicToHandle){
+    private void handleTopics(EmergencyMatch topicToHandle){
+        String startingPhrase = ((topicToHandle.getPhrase() != 0) ? mainActivity.getString(topicToHandle.getPhrase()) : null);
+
+        if(startingPhrase != null) {
+            robotHelper.saySync(startingPhrase).run();
+        }
+        else {
+            robotHelper.saySync("Posso andare o posso fare altro?");
+        }
+
+        Locale locale = new Locale(Language.ITALIAN, Region.ITALY);
         Topic topic = TopicBuilder.with(qiContext)
-                .withResource(topicToHandle)
+                .withResource(topicToHandle.getTopic())
                 .build();
 
         QiChatbot qiChatbot = QiChatbotBuilder.with(qiContext)
                 .withTopic(topic)
+                .withLocale(locale)
                 .build();
 
         chat = ChatBuilder.with(qiContext)
                 .withChatbot(qiChatbot)
+                .withLocale(locale)
                 .build();
 
         chat.addOnStartedListener(() -> {
@@ -391,7 +387,12 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             robotHelper.releaseAbilities();
             chatFuture.requestCancellation();
             if(!topics.empty()){
+
                 handleTopics(topics.pop());
+            }
+            else {
+                emergencyListener = NavigationFragment.this;
+                emergencyListener.onEmergencyHandled();
             }
         });
 

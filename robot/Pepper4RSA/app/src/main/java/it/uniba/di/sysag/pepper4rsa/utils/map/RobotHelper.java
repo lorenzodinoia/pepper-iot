@@ -1,5 +1,6 @@
 package it.uniba.di.sysag.pepper4rsa.utils.map;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.aldebaran.qi.Future;
@@ -11,6 +12,7 @@ import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.actuation.Mapping;
 import com.aldebaran.qi.sdk.object.conversation.BodyLanguageOption;
+import com.aldebaran.qi.sdk.object.conversation.Say;
 import com.aldebaran.qi.sdk.object.geometry.TransformTime;
 import com.aldebaran.qi.sdk.object.holder.AutonomousAbilitiesType;
 import com.aldebaran.qi.sdk.object.holder.Holder;
@@ -19,6 +21,8 @@ import com.aldebaran.qi.sdk.object.locale.Locale;
 import com.aldebaran.qi.sdk.object.locale.Region;
 import com.aldebaran.qi.sdk.object.power.FlapSensor;
 import com.aldebaran.qi.sdk.object.power.Power;
+
+import it.uniba.di.sysag.pepper4rsa.R;
 
 public class RobotHelper {
     private static final String TAG = "MSI_RobotHelper";
@@ -71,10 +75,10 @@ public class RobotHelper {
      *
      * @return Charging flap state: "True" if opened, "False" if closed
      */
-    public boolean askToCloseIfFlapIsOpened() {
+    public boolean askToCloseIfFlapIsOpened(Context context) {
         boolean isFlapOpened = getFlapState();
         if (isFlapOpened)
-            say("Please close my charging flap then start the action you want");
+            say(context.getString(R.string.close_charging_flat));
         return isFlapOpened;
     }
 
@@ -134,7 +138,7 @@ public class RobotHelper {
     public Future<Void> say(final String text) {
         return SayBuilder.with(qiContext)
                 .withText(text)
-                .withLocale(new Locale(Language.ENGLISH, Region.UNITED_STATES))
+                .withLocale(new Locale(Language.ITALIAN, Region.ITALY))
                 .withBodyLanguageOption(BodyLanguageOption.DISABLED)
                 .buildAsync().andThenCompose(say -> {
                     Log.d(TAG, "Say started : " + text);
@@ -142,6 +146,12 @@ public class RobotHelper {
                 });
     }
 
+    public Say saySync(final String text){
+        return SayBuilder.with(qiContext)
+                .withText(text)
+                .withLocale(new Locale(Language.ITALIAN, Region.ITALY))
+                .build();
+    }
     /**
      * Get the Frame of the origin of the map.
      *

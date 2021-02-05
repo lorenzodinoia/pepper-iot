@@ -40,7 +40,7 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         robotHelper = mainActivity.getRobotHelper();
-        robotHelper.say("Please bring me to the mapFrame before localize and start service");
+        robotHelper.say(getString(R.string.starting_phrase));
         buttonStartLocalize = view.findViewById(R.id.buttonStartLocalize);
         buttonStartService = view.findViewById(R.id.buttonStartService);
 
@@ -49,7 +49,7 @@ public class MainFragment extends Fragment {
             mainActivity.runOnUiThread(() -> {
                 if (result == LocalizeAndMapHelper.LocalizationStatus.LOCALIZED) {
                     robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
-                    robotHelper.say("Localization finished");
+                    robotHelper.say(getString(R.string.localization_finished));
                     Log.d(MainActivity.CONSOLE_TAG, "Localized");
                     mainActivity.setLocalized(true);
                     buttonStartService.setEnabled(true);
@@ -58,10 +58,10 @@ public class MainFragment extends Fragment {
                     buttonStartLocalize.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_icn_localize_robot_burgermenu_oklocation, 0, 0);
                 } else if (result == LocalizeAndMapHelper.LocalizationStatus.MAP_MISSING) {
                     robotHelper.localizeAndMapHelper.removeOnFinishedLocalizingListeners();
-                    robotHelper.say("Map missing");
+                    robotHelper.say(getString(R.string.map_missing));
                     Log.d(MainActivity.CONSOLE_TAG, "Map_Missing");
                 } else if (result == LocalizeAndMapHelper.LocalizationStatus.FAILED) {
-                    robotHelper.say("Localization failed");
+                    robotHelper.say(getString(R.string.localization_failed));
                     Log.d(MainActivity.CONSOLE_TAG, "Failed");
                 } else {
                     Log.d(MainActivity.CONSOLE_TAG, "onViewCreated: Unable to localize in Map");
@@ -70,7 +70,7 @@ public class MainFragment extends Fragment {
         });
 
         buttonStartLocalize.setOnClickListener(v -> {
-            if(robotHelper.askToCloseIfFlapIsOpened()){
+            if(robotHelper.askToCloseIfFlapIsOpened(mainActivity)){
                 Log.d(MainActivity.CONSOLE_TAG, "Flat opened");
             }
             else {
@@ -80,7 +80,7 @@ public class MainFragment extends Fragment {
         });
 
         buttonStartService.setOnClickListener(v -> {
-            if(robotHelper.askToCloseIfFlapIsOpened()){
+            if(robotHelper.askToCloseIfFlapIsOpened(mainActivity)){
                 Log.d(MainActivity.CONSOLE_TAG, "Flat opened");
             }
             else{
@@ -90,7 +90,7 @@ public class MainFragment extends Fragment {
                     mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();
                 }
                 else{
-                    robotHelper.say("Please localize me before start service");
+                    robotHelper.say(getString(R.string.localize_before_start_service));
                 }
             }
         });
