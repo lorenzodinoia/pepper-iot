@@ -85,25 +85,36 @@ class Vital_data:
                         return 400
                 
                 emergency_flag = False
-                if((self.bpm < MIN_BPM) or (self.bpm > MAX_BPM)):
-                    if(self.bpm > 0):
-                        emergency_flag = True
-                if((self.body_temperature < MIN_BODY_TEMPERATURE) or (self.body_temperature > MAX_BODY_TEMPERATURE)):
-                    if(self.body_temperature > 0):
-                        emergency_flag = True
-                if((self.min_body_pressure < MIN_MIN_BODY_PRESSURE) or (self.min_body_pressure > MAX_MIN_BODY_PRESSURE)):
-                    if(self.min_body_pressure > 0):
-                        emergency_flag = True
-                if((self.max_body_pressure < MIN_MAX_BODY_PRESSURE) or (self.max_body_pressure > MAX_MAX_BODY_PRESSURE)):
-                    if(self.max_body_pressure > 0):
-                        emergency_flag = True
-                if(self.blood_oxygenation < MIN_BLOOD_OXYGENATION):
-                    if(self.blood_oxygenation > 0):
-                        emergency_flag = True
+                emergency_string = []
+                if ((self.bpm < MIN_BPM) and (self.bpm > 0)):
+                    emergency_flag = True
+                    emergency_string.append("bpm-")
+                if ((self.body_temperature < MIN_BODY_TEMPERATURE) and (self.body_temperature > 0)):
+                    emergency_flag = True
+                    emergency_string.append("temperature-")
+                if (self.body_temperature > MAX_BODY_TEMPERATURE):
+                    emergency_flag = True
+                    emergency_string.append("temperature+")
+                if ((self.min_body_pressure < MIN_MIN_BODY_PRESSURE) and (self.min_body_pressure > 0)):
+                    emergency_flag = True
+                    emergency_string.append("min_pressure-")
+                if (self.min_body_pressure > MAX_MIN_BODY_PRESSURE):
+                    emergency_flag = True
+                    emergency_string.append("min_pressure+")
+                if ((self.max_body_pressure < MIN_MAX_BODY_PRESSURE) and (self.max_body_pressure > 0)):
+                    emergency_flag = True
+                    emergency_string.append("max_pressure-")
+                if (self.max_body_pressure > MAX_MAX_BODY_PRESSURE):
+                    emergency_flag = True
+                    emergency_string.append("max_pressure+")
+                if ((self.blood_oxygenation < MIN_BLOOD_OXYGENATION) and (self.blood_oxygenation > 0)):
+                    emergency_flag = True
+                    emergency_string.append("oxygenation-")
                 
-                if(emergency_flag):
+                if (emergency_flag):
+                    tags = ';'.join(emergency_string)
                     emergency_obj = Emergency(None, None, None, None, None, None, None, None, None)
-                    data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id, "bed_id" : bed_id, "tags": ""}
+                    data = {"level_em" : 0, "type_em" : 1, "vital_signs_id" : self.id, "bed_id" : bed_id, "tags": tags}
                     value = emergency_obj.add_emergency(data)
                     if(value != 200):
                         return 500

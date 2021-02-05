@@ -59,12 +59,10 @@ class Emergency:
 
                 if(self.type_em == 0):
                     if("env_data_id" in data):
-                        print(self.tags)
                         self.env_data_id = data["env_data_id"]
                         val = (self.level_em, self.type_em, self.env_data_id, self.tags)
                         sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, env_data_id, tags) VALUES (NOW(), %d, %d, False, %d, "%s")""" % val)
                         cursor.execute(sql)
-                        print("qui")
                         mydb.commit()
                     else: 
                         return 400
@@ -72,8 +70,8 @@ class Emergency:
                     if("vital_signs_id" in data and "bed_id" in data):
                         self.vital_signs_id = data["vital_signs_id"]
                         self.bed_id = data["bed_id"]
-                        val = (self.level_em, self.type_em, self.vital_signs_id, self.bed_id)
-                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id, bed_id) VALUES (NOW(), %d, %d, False, %d, %d)""" % val)
+                        val = (self.level_em, self.type_em, self.vital_signs_id, self.bed_id, self.tags)
+                        sql = ("""INSERT INTO emergency (tmstp, level_em, type_em, done, vital_signs_id, bed_id, tags) VALUES (NOW(), %d, %d, False, %d, %d, "%s")""" % val)
                         cursor.execute(sql)
                         mydb.commit()
                     else:
