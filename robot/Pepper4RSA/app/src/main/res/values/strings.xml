@@ -10,7 +10,7 @@
     <string name="map_missing">Map missing</string>
     <string name="localization_failed">Localization failed</string>
 
-    <string name="message_server_unreachable" translatable="false">Service not avaible</string>
+    <string name="message_server_unreachable" translatable="false">Service not available</string>
     <string name="message_404">Element not available</string>
     <string name="message_500">There is a problem on server</string>
     <string name="message_generic_error">There was a problem</string>
@@ -27,4 +27,5 @@
     <string name="goto_text">I go to…</string>
 
     <string name="hello">Hello</string>
+    <string name="emergency_button_phrase">Hello, you call me, how can i help you?</string>
 </resources>

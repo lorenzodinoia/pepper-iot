@@ -7,11 +7,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -130,7 +132,6 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             for (Map.Entry<String, AttachedFrame> stringAttachedFrameEntry : mainActivity.getSavedLocations().entrySet()) {
                 Transform transform = (((stringAttachedFrameEntry.getValue()).async().frame()).getValue().async().computeTransform(mapFrame)).getValue().getTransform();
                 poiPositions.add(new PointF(((float) transform.getTranslation().getX()), (float) transform.getTranslation().getY()));
-                //Log.d(TAG, "createGoToPopup: transform: "+(((stringAttachedFrameEntry.getValue()).async().frame()).getValue().async().computeTransform(mapFrame)).getValue().getTransform().getTranslation().toString());
             }
 
             explorationMapView.setExplorationMap(value.getTopGraphicalRepresentation());
@@ -317,7 +318,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private void createStack(Emergency emergency){
         topics.clear();
         //TODO Add conclusion
-        topics.push(new EmergencyMatch(R.raw.greetings, 0));
+        //topics.push(new EmergencyMatch(R.raw.greetings, 0));
 
         switch (emergency.getType()) {
             case 0:
@@ -337,12 +338,8 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 //topics.push(R.raw.greetings);
                 break;
             case 2:
-                //TODO change
-                //topics.push(R.raw.greetings);
-                break;
             case 3:
-                //TODO change
-                //topics.push(R.raw.greetings);
+                topics.push(new EmergencyMatch(R.raw.emergency, R.string.emergency_button_phrase));
                 break;
             default:
                 break;
@@ -393,6 +390,8 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             else {
                 emergencyListener = NavigationFragment.this;
                 emergencyListener.onEmergencyHandled();
+                emergency = null;
+                goToLocation(MAP_FRAME, null);
             }
         });
 

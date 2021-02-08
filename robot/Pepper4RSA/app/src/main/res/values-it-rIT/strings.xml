@@ -16,7 +16,7 @@
     <string name="message_500">C\'è un problema su server</string>
     <string name="message_generic_error">Si è verificato un problema</string>
 
-    <string name="starting_phrase">Perfavore portami al mapFrame prima di localizzarmi e far partire il servizio</string>
+    <string name="starting_phrase">Perfavore portami alla base prima di localizzarmi e far partire il servizio</string>
     <string name="localize_before_start_service">Per favore effettua la localizzazione prima di avviare il servizio</string>
     <string name="back_to_mapFrame">Sto tornando alla base</string>
 
@@ -26,5 +26,6 @@
     <string name="navigation_failed">Navigazione fallita</string>
 
     <string name="goto_text">Mi dirigo verso…</string>
-    <string name="hello">Ciao, inizio conversazione</string>
+    <string name="hello">Ciao</string>
+    <string name="emergency_button_phrase">Ciao, mi hai chiamato, come posso aiutarti?</string>
 </resources>
