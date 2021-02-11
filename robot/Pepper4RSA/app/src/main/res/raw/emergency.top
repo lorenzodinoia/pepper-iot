@@ -1,6 +1,5 @@
 topic: ~emergency ()
 
-
 concept:(hello) ^rand[ciao hey salve "hey ciao"]
 
 concept:(greetings) ^rand["ok vado a dopo" "va bene, ciao" "ok, quando vuoi puoi chiamarmi. Ciao"]
@@ -11,25 +10,30 @@ concept:(okAction) ^rand["ok, lo faccio subito" "certo" "certamente"]
 
 concept:(askForActions) ^rand["cosa posso fare per te?" "cosa posso fare?" "hai bisogno di qualcosa?"]
 
+concept:(wheather) ["oggi è una bella giornata anche se c'è un pò di vento"]
+
 concept:(whatCanYouDo) ["cosa sai fare?" "cosa puoi fare?" "che sai fare?" "che puoi fare?" "che funzioni hai?"]
 
 concept:(askForOtherActions) ^rand["che altro posso fare per te?" "cos'altro posso fare per te?" "se vuoi puoi chiedermi di fare qualcos'altro"]
 
 concept:(tellAjoke) ["raccontami una barzelletta"]
 
-concept:(callDoctor) ["chiama un dottore *" "* chiamare un dottore *?" "chiama una dottoressa *" "* chiamare una dottoressa *?" "chiama qualcuno *" "* chiamare qualcuno *?"]
+concept:(feelAlone) ["* mi sento solo * {fammi compagnia} *" "* mi sento sola * {fammi compagnia} *"]
+
+concept:(callDoctor) ["chiama un dottore *" "* chiamare un dottore *?" "chiama una dottoressa *" "* chiamare una dottoressa *?" "* chiama un infermiera *?" "* chiama un infermiere *?" "chiama qualcuno *" "* chiamare qualcuno *?"]
 
 concept:(askForDrugs) ["che medicine devo prendere *?" "quali medicine devo prendere *?" "che medicinale devo prendere *?" "quale medicinale devo prendere *?"]
 
-concept:(drugs) ^rand["prendi una bustina di OKI dopo aver mangiato qualcosa" "prendi una tachipirina. puoi prenderla anche a stomaco vuoto se vuoi"]
+concept:(drugs) ^rand["ora dovresti prendere una bustina di OKI a stomaco pieno, hai mangiato da poco, vero?" "prendi una tachipirina. puoi prenderla anche a stomaco vuoto se vuoi"]
 
 concept:(askForDinner) ["cosa c'è per cena {oggi}?" "cosa c'è da mangiare stasera?" "che c'è per cena {oggi}?" "che si mangia stasera?" "che si mangia a cena?"]
 
-concept:(dinner) ["Oggi si mangia pasta con i fagioli. Se non è di tuo gradimento puoi parlare con un infermiere per concordare un altro tipo di cena"]
+concept:(dinner) ["Oggi si mangia pollo con le patate. Se non è di tuo gradimento puoi parlare con un infermiere per concordare un altro tipo di cena"]
 
 concept:(joke) ^rand["Il deserto del Sahara è in Africa. Su questo non ci piove." "Chiude una fabbrica di carta igienica: andava a rotoli" "Ho inventato un cappotto che va bene per tutte le stagioni; quando fa caldo basta toglierlo" "Chi sale sull’autobus col mal di testa deve pagare due biglietti. Il mal di testa è passeggero" "
-
 Ragazza stufa scappa di casa. Genitori morti dal freddo"]
+
+concept:(acceptance) ^rand[si]
 
 u:(~hello {pepper}) ~hello, ~askForActions
 
@@ -37,10 +41,15 @@ u:({~hello} {pepper} ~whatCanYouDo) "Posso chiamare un dottore, posso dirti che 
 
 u:({pepper} ~callDoctor) ~okAction, ~askForOtherActions
 
-u:({pepper} ~askForDrugs) ~drugs, ~askForOtherActions
+u:({pepper} ~askForDrugs) ~drugs
+    u1:(~acceptance) Ok, ~askForOtherActions
 
 u:({pepper} ~askForDinner) ~dinner, ~askForOtherActions
 
 u:(~tellAjoke) ~joke
 
+u:(~feelAlone) "Chiamo un tuo parente", ~askForOtherActions
+
 u:({pepper} ~finish) ~greetings ^endDiscuss(success)
+
+u:("* tempo *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {oggi}?") ~wheather
