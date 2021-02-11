@@ -28,4 +28,14 @@
 
     <string name="hello">Hello</string>
     <string name="emergency_button_phrase">Hello, you call me, how can i help you?</string>
+    <string name="send_pepper_phrase">Hi, they sent me to you, what can I do?</string>
+    <string name="vital_sings_em_phrase">Hi, you have altered vital signs, are you feeling well? If you want, I can call a doctor</string>
+
+    <string name="lux_minus_say">There is poor light, do you want to turn on the light?</string>
+    <string name="lux_plus_say">There is too much light, do you want to turn off the light?</string>
+    <string name="voc_plus_say">There\'s a little too much spoiled air, do you want to open the window?</string>
+    <string name="degree_minus_say">It\'s a bit cold, do you want to turn on the heating?</string>
+    <string name="degree_plus_say">It\'s a little hot, do you want to turn on the air conditioning?</string>
+    <string name="humidity_plus_say">It\'s a little humid here, do you want to turn on the air conditioning?</string>
+
 </resources>

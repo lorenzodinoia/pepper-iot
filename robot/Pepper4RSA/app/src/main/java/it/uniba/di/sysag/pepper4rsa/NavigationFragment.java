@@ -7,31 +7,35 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.aldebaran.qi.Future;
 import com.aldebaran.qi.sdk.QiContext;
 import com.aldebaran.qi.sdk.builder.ChatBuilder;
+import com.aldebaran.qi.sdk.builder.ListenBuilder;
+import com.aldebaran.qi.sdk.builder.PhraseSetBuilder;
 import com.aldebaran.qi.sdk.builder.QiChatbotBuilder;
 import com.aldebaran.qi.sdk.builder.TopicBuilder;
 import com.aldebaran.qi.sdk.object.actuation.AttachedFrame;
 import com.aldebaran.qi.sdk.object.actuation.Frame;
 import com.aldebaran.qi.sdk.object.actuation.OrientationPolicy;
 import com.aldebaran.qi.sdk.object.conversation.Chat;
+import com.aldebaran.qi.sdk.object.conversation.Listen;
+import com.aldebaran.qi.sdk.object.conversation.ListenResult;
+import com.aldebaran.qi.sdk.object.conversation.PhraseSet;
 import com.aldebaran.qi.sdk.object.conversation.QiChatbot;
 import com.aldebaran.qi.sdk.object.conversation.Topic;
 import com.aldebaran.qi.sdk.object.geometry.Transform;
 import com.aldebaran.qi.sdk.object.locale.Language;
 import com.aldebaran.qi.sdk.object.locale.Locale;
 import com.aldebaran.qi.sdk.object.locale.Region;
+import com.aldebaran.qi.sdk.util.PhraseSetUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,18 +82,18 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private String label;
 
     private Chat chat;
-    private Stack<EmergencyMatch> topics = new Stack<>();
+    private Stack<String> topics = new Stack<>();
 
     private Boolean atMapFrame = false;
 
-    public static final HashMap<String, EmergencyMatch> topicsMap = new HashMap<>();
+    public static final HashMap<String, Integer> topicsMap = new HashMap<>();
     static{
-        topicsMap.put("lux-", new EmergencyMatch(R.raw.greetings, R.string.hello));
-        topicsMap.put("lux+", new EmergencyMatch(R.raw.greetings, R.string.hello));
-        topicsMap.put("voc+", new EmergencyMatch(R.raw.greetings, R.string.hello));
-        topicsMap.put("degree-", new EmergencyMatch(R.raw.greetings, R.string.hello));
-        topicsMap.put("degree+", new EmergencyMatch(R.raw.greetings, R.string.hello));
-        topicsMap.put("humidity+", new EmergencyMatch(R.raw.greetings, R.string.hello));
+        topicsMap.put("lux-", R.string.lux_minus_say);
+        topicsMap.put("lux+", R.string.lux_plus_say);
+        topicsMap.put("voc+", R.string.voc_plus_say);
+        topicsMap.put("degree-", R.string.degree_minus_say);
+        topicsMap.put("degree+", R.string.degree_plus_say);
+        topicsMap.put("humidity+", R.string.humidity_plus_say);
     }
 
     public NavigationFragment() {
@@ -232,11 +236,8 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                     Log.d(MainActivity.CONSOLE_TAG, "Navigation Finished");
                     if (emergencyListener == null) {
                         if(emergency != null) {
-                            createStack(emergency);
-                            if(!topics.empty()) {
-                                Thread thread = new Thread(() -> handleTopics(topics.pop()));
-                                thread.start();
-                            }
+                            Thread thread = new Thread(() -> handleEmergency(emergency));
+                            thread.start();
                         }
                     }
                 });
@@ -315,13 +316,15 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
         });
     }
 
-    private void createStack(Emergency emergency){
-        topics.clear();
-        //TODO Add conclusion
-        //topics.push(new EmergencyMatch(R.raw.greetings, 0));
+    private void handleEmergency(Emergency emergency){
+        PhraseSet phraseSetYes = PhraseSetBuilder.with(qiContext).withTexts("si", "ok", "certo", "si, grazie", "si, certo").build();
+        PhraseSet phraseSetNo = PhraseSetBuilder.with(qiContext).withTexts("si", "ok", "certo", "si, grazie", "si, certo").build();
+
+        robotHelper.saySync(getString(R.string.hello));
 
         switch (emergency.getType()) {
             case 0:
+                Listen listen = ListenBuilder.with(qiContext).withPhraseSets(phraseSetYes, phraseSetNo).build();
                 String tags = emergency.getTags();
                 Log.d(MainActivity.CONSOLE_TAG, "tags: " + tags);
                 StringTokenizer stringTokenizer = new StringTokenizer(tags, ";");
@@ -329,24 +332,101 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                     String tag = stringTokenizer.nextToken();
                     Log.d(MainActivity.CONSOLE_TAG, tag);
                     if(topicsMap.containsKey(tag)){
-                        topics.push(topicsMap.get(tag));
+                        robotHelper.saySync(getString(topicsMap.get(tag)));
+                        ListenResult listenResult = listen.run();
+                        PhraseSet matchedPhraseSet = listenResult.getMatchedPhraseSet();
+                        if(PhraseSetUtil.equals(matchedPhraseSet, phraseSetYes)){
+                            Log.d(MainActivity.CONSOLE_TAG, "PhraseSet Yes");
+                        }
+                        else{
+                            Log.d(MainActivity.CONSOLE_TAG, "PhraseSet No");
+                        }
+                        robotHelper.saySync("Ok");
                     }
                 }
+
+                robotHelper.saySync("Posso fare altro per te o posso andare?");
+                startTopic(R.raw.emergency, endReason -> {
+                    robotHelper.releaseAbilities();
+                    emergencyListener = NavigationFragment.this;
+                    emergencyListener.onEmergencyHandled();
+                    NavigationFragment.this.emergency = null;
+                    goToLocation(MAP_FRAME, null);
+                });
                 break;
             case 1:
-                //TODO change
-                //topics.push(R.raw.greetings);
+                robotHelper.saySync(getString(R.string.vital_sings_em_phrase));
+                //TODO modificare topic
+                startTopic(R.raw.emergency, endReason -> {
+                    robotHelper.releaseAbilities();
+                    emergencyListener = NavigationFragment.this;
+                    emergencyListener.onEmergencyHandled();
+                    NavigationFragment.this.emergency = null;
+                    goToLocation(MAP_FRAME, null);
+                });
                 break;
             case 2:
+                robotHelper.saySync(getString(R.string.emergency_button_phrase));
+                startTopic(R.raw.emergency, endReason -> {
+                    robotHelper.releaseAbilities();
+                    emergencyListener = NavigationFragment.this;
+                    emergencyListener.onEmergencyHandled();
+                    NavigationFragment.this.emergency = null;
+                    goToLocation(MAP_FRAME, null);
+                });
             case 3:
-                topics.push(new EmergencyMatch(R.raw.emergency, R.string.emergency_button_phrase));
+                robotHelper.saySync(getString(R.string.send_pepper_phrase));
+                startTopic(R.raw.emergency, endReason -> {
+                    robotHelper.releaseAbilities();
+                    emergencyListener = NavigationFragment.this;
+                    emergencyListener.onEmergencyHandled();
+                    NavigationFragment.this.emergency = null;
+                    goToLocation(MAP_FRAME, null);
+                });
                 break;
             default:
                 break;
         }
     }
 
-    private void handleTopics(EmergencyMatch topicToHandle){
+    private void startTopic(Integer topicResource, QiChatbot.OnEndedListener chatEndedListener){
+        Locale locale = new Locale(Language.ITALIAN, Region.ITALY);
+        Topic topic = TopicBuilder.with(qiContext)
+                .withResource(topicResource)
+                .build();
+
+        QiChatbot qiChatbot = QiChatbotBuilder.with(qiContext)
+                .withTopic(topic)
+                .withLocale(locale)
+                .build();
+
+        chat = ChatBuilder.with(qiContext)
+                .withChatbot(qiChatbot)
+                .withLocale(locale)
+                .build();
+
+        chat.addOnStartedListener(() -> {
+            Log.d(MainActivity.CONSOLE_TAG, "Topic started");
+            if (chat != null) {
+                chat.removeAllOnStartedListeners();
+            }
+        });
+
+        Future<Void> chatFuture = chat.async().run();
+
+        qiChatbot.addOnEndedListener(endReason -> {
+            chatFuture.requestCancellation();
+        });
+        qiChatbot.addOnEndedListener(chatEndedListener);
+
+        chatFuture.thenConsume(value -> {
+            if (value.hasError()) {
+                Log.d(MainActivity.CONSOLE_TAG, "Discussion finished with error.", value.getError());
+            }
+        });
+    }
+
+    /*private void handleTopics(EmergencyMatch topicToHandle){
         String startingPhrase = ((topicToHandle.getPhrase() != 0) ? mainActivity.getString(topicToHandle.getPhrase()) : null);
 
         if(startingPhrase != null) {
@@ -400,5 +480,5 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 Log.d(MainActivity.CONSOLE_TAG, "Discussion finished with error.", valuex.getError());
             }
         });
-    }
+    }*/
 }

@@ -1,21 +1,23 @@
 package it.uniba.di.sysag.pepper4rsa.utils.models;
 
+import com.aldebaran.qi.sdk.object.conversation.PhraseSet;
+
 public class EmergencyMatch {
 
-    private int topic;
+    private PhraseSet phraseSet;
     private int phrase;
 
-    public EmergencyMatch(int topic, int phrase){
-        this.topic = topic;
+    public EmergencyMatch(PhraseSet phraseSet, int phrase){
+        this.phraseSet = phraseSet;
         this.phrase = phrase;
     }
 
-    public int getTopic() {
-        return topic;
+    public PhraseSet getPhraseSet() {
+        return phraseSet;
     }
 
-    public void setTopic(int topic) {
-        this.topic = topic;
+    public void setPhraseSet(PhraseSet phraseSet) {
+        this.phraseSet = phraseSet;
     }
 
     public int getPhrase() {
