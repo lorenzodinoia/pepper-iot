@@ -85,4 +85,12 @@ export class InmateComponent implements OnInit {
     this.oxygenationChart.reset();
     this.pressureChart.reset();
   }
+
+  public sendPepper(): void {
+    this.inmate.sendPepper(this._client).subscribe((response) => {
+      if (response) {
+        alert("Pepper inviato");
+      }
+    })
+  }
 }

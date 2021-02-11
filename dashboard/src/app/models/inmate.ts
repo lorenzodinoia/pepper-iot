@@ -64,4 +64,10 @@ export class Inmate extends Model {
             return Inmate.fromJSON(response);
           }));
     }
+
+    public sendPepper(client: Client): Observable<boolean> {
+        return client.httpClient.post<boolean>(`${Client.SERVER_URL}/inmate/sendPepper?id=${this.id}`, null, Client.OPTIONS).pipe(map((data: any) => {
+            return ("message" in data && data["message"] == "Ok");
+        })); 
+    }
 }

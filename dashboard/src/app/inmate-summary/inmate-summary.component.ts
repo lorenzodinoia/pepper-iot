@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Client } from '../client';
 import { Inmate } from '../models/inmate';
 
 @Component({
@@ -10,9 +11,16 @@ export class InmateSummaryComponent implements OnInit {
   @Input()
   public inmate!: Inmate;
 
-  constructor() { }
+  constructor(private _client: Client) { }
 
   ngOnInit(): void {
   }
 
+  public sendPepper(): void {
+    this.inmate.sendPepper(this._client).subscribe((response) => {
+      if (response) {
+        alert("Pepper inviato");
+      }
+    })
+  }
 }

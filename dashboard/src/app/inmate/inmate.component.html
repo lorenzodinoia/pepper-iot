@@ -7,7 +7,7 @@
             <h2>{{inmate.name}} {{inmate.surname}}</h2>
             <p>{{inmate.cf}}</p>
             <p class="text-secondary">Ultimo aggiornamento: {{lastUpdateAsString}}</p>
-            <button type="button" class="btn btn-outline-success">Invia Pepper</button>
+            <button type="button" class="btn btn-outline-success" (click)="sendPepper()">Invia Pepper</button>
         </div>
     </div>
     <hr class="divider"/>

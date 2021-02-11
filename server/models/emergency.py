@@ -102,7 +102,6 @@ class Emergency:
                         #Check if there is another emergency for the same inmate that has a timestamp difference below 1 min.
                         valid = True
                         now = datetime.now()
-                        print(list)
                         for vital_sign in list:
                             difference = now - vital_sign["tmstp_em"]
                             if(difference.seconds < 60) : 
