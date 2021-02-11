@@ -54,7 +54,6 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.GoToHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.map.PointsOfInterestView;
 import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 import it.uniba.di.sysag.pepper4rsa.utils.models.Emergency;
-import it.uniba.di.sysag.pepper4rsa.utils.models.EmergencyMatch;
 import it.uniba.di.sysag.pepper4rsa.utils.request.EmergencyRequest;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
