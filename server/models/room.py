@@ -176,12 +176,11 @@ def get_list():
 
 @room_blueprint.route("/all", methods=["GET"]) #Get list of all avaible rooms with beds and inmates
 def get_all():
-    obj = Room(None, None)
-    value = obj.get_all_rooms()
-    if(value != 500):
+    value = get_all_rooms()
+    if(value is not None):
         return jsonify(value)
     else:
-        return abort(value)
+        return abort(500)
 
 @room_blueprint.route("/", methods=["GET"]) #Get the single room with last env_data and all inmates
 def get():
@@ -263,6 +262,41 @@ def get_room(room_id: int) -> dict:
         room = {'id' : room_id, 'name' : env_datas[0]['name_room'],'beds' : bed_results, 'env_data' : env_data}
             
         return room
+    except Exception as e:
+        print(e)
+        return None
+
+def get_all_rooms() -> dict:
+    try:
+        database = mysql.connector.connect(user = os.getenv("DATABASE_USER"), database = os.getenv("DATABASE_NAME"), password = os.getenv("DATABASE_PASSWORD"))
+        cursor = database.cursor()
+        cursor.execute("SELECT * FROM room INNER JOIN (SELECT bed.id AS bed_id, bed.inmate_id, inmate.name, inmate.surname, bed.room_id FROM bed INNER JOIN inmate ON bed.inmate_id = inmate.id) AS bed_inmate ON room.id = bed_inmate.room_id ORDER BY id ASC")
+        room_columns = [column[0] for column in cursor.description]
+        room_list = []
+        for row in cursor.fetchall():
+            room_list.append(dict(zip(room_columns, row)))
+
+        #Create bed collection for each room
+        rooms = []
+        for room in room_list:
+            inmate = {'id': room['inmate_id'], 'name': room['name'], 'surname': room['surname']}
+            bed = {'id': room['bed_id'], 'inmate': inmate}
+            founded_rooms = list(filter(lambda element: element.get('id') == room['id'], rooms))
+            if len(founded_rooms) == 0: #Room doesn't exists
+                room_id = room['id']
+                room_name = room['name_room']
+                room_beds = []
+                room_beds.append(bed)
+                new_room = {'id': room_id, 'name': room_name, 'beds': room_beds}
+                rooms.append(new_room)
+            else:
+                existing_room = founded_rooms[0]
+                existing_room['beds'].append(bed)
+
+        for room in rooms:
+            room["beds"].sort(key=sortById)
+
+        return rooms
     except Exception as e:
         print(e)
         return None
