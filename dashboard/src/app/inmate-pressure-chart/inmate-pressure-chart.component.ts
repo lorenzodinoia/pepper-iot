@@ -42,11 +42,14 @@ export class InmatePressureChartComponent implements OnInit {
   }
 
   private setData(hours: Array<string>, minValues: Array<number>, maxValues: Array<number>, changeLatest: boolean = false): void {
+    let length: number = minValues.length
     if (changeLatest) {
       let minLatest: number = minValues[minValues.length - 1];
       let maxLatest: number = maxValues[maxValues.length - 1];
       this.latest = `${minLatest}/${maxLatest}`;
     }
+
+    let sliderStart: number = ((length <= 40) ? 0 : ((100 * (length - 40) / length))); //Show always 40 points
     
     this.chartOptions = {
       tooltip: {
@@ -58,7 +61,7 @@ export class InmatePressureChartComponent implements OnInit {
           type: 'slider',
           xAxisIndex: [0, 1],
           filterMode: 'filter',
-          start: 80 //TODO Adattare al numero di valori con una formula
+          start: sliderStart
       },
       {
           id: 'dataZoomY',

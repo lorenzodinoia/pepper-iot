@@ -40,9 +40,12 @@ export class RoomVocChartComponent implements OnInit {
   }
 
   private setData(hours: Array<string>, values: Array<number>, changeLatest: boolean = false): void {
+    let length: number = values.length
     if (changeLatest) {
-      this.latest = values[values.length - 1];
+      this.latest = values[length - 1];
     }
+
+    let sliderStart: number = ((length <= 40) ? 0 : ((100 * (length - 40) / length))); //Show always 40 points
 
     this.chartOptions = {
       tooltip: {
@@ -54,7 +57,7 @@ export class RoomVocChartComponent implements OnInit {
           type: 'slider',
           xAxisIndex: [0],
           filterMode: 'filter',
-          start: 80 //TODO Adattare al numero di valori con una formula
+          start: sliderStart
       },
       {
           id: 'dataZoomY',
