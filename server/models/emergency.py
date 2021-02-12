@@ -143,33 +143,48 @@ class Emergency:
             emergency_columns = [column[0] for column in cursor.description]
             emergency_list = []
             for row in cursor.fetchall():
-                emergency_list.append(dict(zip(emergency_columns, row)))
+                emergency = dict(zip(emergency_columns, row))
+                new_emergency = {}
 
-            queue = []
-            env_data_em = []
-            vital_signs_em = []
-            button_em = []
-            for emergency in emergency_list:
-                if(emergency["type_em"] == 0):
-                    new_emergency = {"id" : emergency["id"], "tmstp" : emergency["tmstp"], "level_em" : emergency["level_em"], "type_em" : emergency["type_em"], "env_data_id" : emergency["env_data_id"]}
-                    env_data_em.append(new_emergency)
-                elif(emergency["type_em"] == 1):
-                    new_emergency = {"id" : emergency["id"], "tmstp" : emergency["tmstp"], "level_em" : emergency["level_em"], "type_em" : emergency["type_em"], "vital_signs_id" : emergency["vital_signs_id"]}
-                    vital_signs_em.append(new_emergency)
-                else:
-                    new_emergency = {"id" : emergency["id"], "tmstp" : emergency["tmstp"], "level_em" : emergency["level_em"], "type_em" : emergency["type_em"], "bed_id" : emergency["bed_id"]}
-                    button_em.append(new_emergency)
 
-            for vital_sign in vital_signs_em:
-                queue.append(vital_sign)
-            for button in button_em:
-                queue.append(button)
-            for env in env_data_em:
-                queue.append(env)
+                emergency_id = emergency["id"]
+                emergency_type = emergency["type_em"]
+                new_emergency = {"id": emergency_id, "type": emergency_type, "level": emergency["level_em"], "tags": emergency["tags"], "tmstp": emergency["tmstp"]}
 
-            
+                if emergency_type == 0: #Environmental emergency
+                    sql = ("""SELECT environmental_data.*, room.id AS room_id, room.name_room AS room_name FROM emergency INNER JOIN environmental_data ON environmental_data.id = emergency.env_data_id INNER JOIN room ON room.id = environmental_data.room_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
+                    cursor.execute(sql)
+                    
+                    join_columns = [column[0] for column in cursor.description]
+                    join_list = []
+                    for row in cursor.fetchall():
+                        join_list.append(dict(zip(join_columns, row)))
 
-            return queue
+                    room = {"id": join_list[0]["room_id"], "name": join_list[0]["room_name"]}
+                    env_data = {"lux": join_list[0]["lux"], "voc": join_list[0]["voc"], "temperature": join_list[0]["degree"], "humidity": join_list[0]["humidity"]}
+                    new_emergency["env_data"] = env_data
+                    new_emergency["room"] = room
+                if emergency_type == 1: #Vital emergency
+                    sql = ("""SELECT emergency.bed_id, vital_signs.* FROM emergency INNER JOIN vital_signs ON vital_signs.id = emergency.vital_signs_id WHERE emergency.id = %d LIMIT 1;""" % (emergency_id))
+                    cursor.execute(sql)
+                    
+                    join_columns = [column[0] for column in cursor.description]
+                    join_list = []
+                    for row in cursor.fetchall():
+                        join_list.append(dict(zip(join_columns, row)))
+                    
+                    emergency_bed_id = emergency["bed_id"]
+                    env_data = {"bpm": join_list[0]["bpm"], "body_temperature": join_list[0]["body_temperature"], "min_body_pressure": join_list[0]["min_body_pressure"], 
+                                "max_body_pressure": join_list[0]["max_body_pressure"], "blood_oxygenation": join_list[0]["blood_oxygenation"]}
+                    new_emergency["vital_signs"] = env_data
+                    new_emergency["bed_id"] = emergency_bed_id
+                if ((emergency_type == 2) or (emergency_type == 3)): #Button pressed
+                    emergency_bed_id = emergency["bed_id"]
+                    new_emergency["bed_id"] = emergency_bed_id
+
+                emergency_list.append(new_emergency)
+
+            return emergency_list
         except Exception as e:
             print(e)
             return 500
