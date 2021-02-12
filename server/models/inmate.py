@@ -83,12 +83,14 @@ class Inmate:
             for row in cursor.fetchall():
                 data.append(dict(zip(columns, row)))
 
+            print(data)
             inmate_data = data[0]
             vital_signs = {'id' : inmate_data['lvs_id'], 'tmstp' : inmate_data['tmstp'], 'bpm' : inmate_data['bpm'], 'body_temperature' : inmate_data['body_temperature'], 'min_body_pressure' : inmate_data['min_body_pressure'], 'max_body_pressure' : inmate_data['max_body_pressure'], 'blood_oxygenation' : inmate_data['blood_oxygenation']}
             new_inmate = {'id' : inmate_data['id'], 'name' : inmate_data['name'], 'surname' : inmate_data['surname'], 'cf' : inmate_data['cf'], 'date_birth' : inmate_data['date_birth'], 'vital_signs' : vital_signs}
 
             return new_inmate
-        except:
+        except Exception as e:
+            print(e)
             return 500
         finally:
             if(mydb.is_connected()):

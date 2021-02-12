@@ -254,7 +254,7 @@ class Emergency:
                 emergency["vital_signs"] = env_data
                 emergency["bed_id"] = emergency_bed_id
                 return emergency
-            if emergency_type == 2: #Button pressed
+            if ((emergency_type == 2) or (emergency_type == 3)): #Button pressed
                 emergency_bed_id = emergency_list[0]["bed_id"]
                 emergency["bed_id"] = emergency_bed_id
                 return emergency

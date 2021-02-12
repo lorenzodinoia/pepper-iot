@@ -89,6 +89,9 @@ class Vital_data:
                 if ((self.bpm < MIN_BPM) and (self.bpm > 0)):
                     emergency_flag = True
                     emergency_string.append("bpm-")
+                if (self.bpm > MAX_BPM) :
+                    emergency_flag = True
+                    emergency_string.append("bpm+")
                 if ((self.body_temperature < MIN_BODY_TEMPERATURE) and (self.body_temperature > 0)):
                     emergency_flag = True
                     emergency_string.append("temperature-")
