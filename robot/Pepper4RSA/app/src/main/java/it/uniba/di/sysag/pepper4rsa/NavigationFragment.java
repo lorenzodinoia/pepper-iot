@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,6 +60,7 @@ import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestException;
 import it.uniba.di.sysag.pepper4rsa.utils.request.core.RequestListener;
 
 public class NavigationFragment extends Fragment implements EmergencyListener {
+    public static final String FRAGMENT_TAG = "navigation_fragment";
     private static final String MAP_FRAME = "mapFrame";
 
     private MainActivity mainActivity;
@@ -74,16 +76,18 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
     private TextView gotoText;
     private LottieAnimationView gotoLoader;
     private TextView gotoFinishedText;
-    private Button closeButton;
     private Frame robotFrame;
     private Frame mapFrame;
     private List<PointF> poiPositions;
     private String label;
+    private Button btnStopNavigation;
 
     private Chat chat;
     private Stack<String> topics = new Stack<>();
 
     private Boolean atMapFrame = false;
+
+    private Boolean stopGoToHuman = false;
 
     public static final HashMap<String, Integer> topicsMap = new HashMap<>();
     static{
@@ -114,12 +118,13 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
         gotoLoader = view.findViewById(R.id.goto_loader);
         gotoLoader.setVisibility(View.GONE);
         gotoFinishedText = view.findViewById(R.id.goto_finished_text);
-        closeButton = view.findViewById(R.id.close_button);
 
-        closeButton.setOnClickListener(v -> {
-            mainActivity.getRobotHelper().goToHelper.checkAndCancelCurrentGoto().andThenConsume(aVoid -> {
-                mainActivity.onBackPressed();
-            });
+        btnStopNavigation = view.findViewById(R.id.stop_navigation_button);
+
+        btnStopNavigation.setVisibility(View.GONE);
+        btnStopNavigation.setOnClickListener(v -> {
+            stopGoToHuman = true;
+            mainActivity.getRobotHelper().goToHelper.checkAndCancelCurrentGoto();
         });
 
         // Retrieve the robot Frame
@@ -209,6 +214,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             Log.d(MainActivity.CONSOLE_TAG, "Movement started");
             mainActivity.runOnUiThread(() -> {
                 gotoText.setVisibility(View.VISIBLE);
+                btnStopNavigation.setVisibility(View.VISIBLE);
                 if(emergency == null){
                     gotoText.setText(getString(R.string.back_to_mapFrame));
                 }
@@ -228,6 +234,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             mainActivity.runOnUiThread(() -> {
                 gotoText.setVisibility(View.GONE);
                 gotoLoader.setVisibility(View.GONE);
+                btnStopNavigation.setVisibility(View.GONE);
             });
 
             if(goToStatus == GoToHelper.GoToStatus.FINISHED) {
@@ -243,7 +250,14 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             }
             else if(goToStatus == GoToHelper.GoToStatus.CANCELLED){
                 Log.d(MainActivity.CONSOLE_TAG, "Navigation Cancelled");
-                robotHelper.say(getString(R.string.navigation_cancelled));
+                if(stopGoToHuman) {
+                    stopGoToHuman = false;
+                    mainActivity.getSupportFragmentManager().popBackStack(NavigationFragment.FRAGMENT_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    robotHelper.say(getString(R.string.navigation_cancelled_by_human));
+                }
+                else{
+                    robotHelper.say(getString(R.string.navigation_cancelled));
+                }
             }
             else{
                 Log.d(MainActivity.CONSOLE_TAG, "Navigation Failed");
@@ -317,9 +331,9 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
 
     private void handleEmergency(Emergency emergency){
         PhraseSet phraseSetYes = PhraseSetBuilder.with(qiContext).withTexts("si", "ok", "certo", "si, grazie", "si, certo").build();
-        PhraseSet phraseSetNo = PhraseSetBuilder.with(qiContext).withTexts("si", "ok", "certo", "si, grazie", "si, certo").build();
+        PhraseSet phraseSetNo = PhraseSetBuilder.with(qiContext).withTexts("no", "no, grazie", "non serve").build();
 
-        robotHelper.saySync(getString(R.string.hello));
+        robotHelper.saySync(getString(R.string.hello)).run();
 
         switch (emergency.getType()) {
             case 0:
@@ -331,7 +345,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                     String tag = stringTokenizer.nextToken();
                     Log.d(MainActivity.CONSOLE_TAG, tag);
                     if(topicsMap.containsKey(tag)){
-                        robotHelper.saySync(getString(topicsMap.get(tag)));
+                        robotHelper.saySync(getString(topicsMap.get(tag))).run();
                         ListenResult listenResult = listen.run();
                         PhraseSet matchedPhraseSet = listenResult.getMatchedPhraseSet();
                         if(PhraseSetUtil.equals(matchedPhraseSet, phraseSetYes)){
@@ -340,11 +354,11 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                         else{
                             Log.d(MainActivity.CONSOLE_TAG, "PhraseSet No");
                         }
-                        robotHelper.saySync("Ok");
+                        robotHelper.saySync("Ok").run();
                     }
                 }
 
-                robotHelper.saySync("Posso fare altro per te o posso andare?");
+                robotHelper.saySync("Posso fare altro per te o posso andare?").run();
                 startTopic(R.raw.emergency, endReason -> {
                     robotHelper.releaseAbilities();
                     emergencyListener = NavigationFragment.this;
@@ -354,8 +368,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 });
                 break;
             case 1:
-                robotHelper.saySync(getString(R.string.vital_sings_em_phrase));
-                //TODO modificare topic
+                robotHelper.saySync(getString(R.string.vital_sings_em_phrase)).run();
                 startTopic(R.raw.emergency, endReason -> {
                     robotHelper.releaseAbilities();
                     emergencyListener = NavigationFragment.this;
@@ -365,7 +378,7 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                 });
                 break;
             case 2:
-                robotHelper.saySync(getString(R.string.emergency_button_phrase));
+                robotHelper.saySync(getString(R.string.emergency_button_phrase)).run();
                 startTopic(R.raw.emergency, endReason -> {
                     robotHelper.releaseAbilities();
                     emergencyListener = NavigationFragment.this;
@@ -373,8 +386,9 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
                     NavigationFragment.this.emergency = null;
                     goToLocation(MAP_FRAME, null);
                 });
+                break;
             case 3:
-                robotHelper.saySync(getString(R.string.send_pepper_phrase));
+                robotHelper.saySync(getString(R.string.send_pepper_phrase)).run();
                 startTopic(R.raw.emergency, endReason -> {
                     robotHelper.releaseAbilities();
                     emergencyListener = NavigationFragment.this;
@@ -424,60 +438,4 @@ public class NavigationFragment extends Fragment implements EmergencyListener {
             }
         });
     }
-
-    /*private void handleTopics(EmergencyMatch topicToHandle){
-        String startingPhrase = ((topicToHandle.getPhrase() != 0) ? mainActivity.getString(topicToHandle.getPhrase()) : null);
-
-        if(startingPhrase != null) {
-            robotHelper.saySync(startingPhrase).run();
-        }
-        else {
-            robotHelper.saySync("Posso andare o posso fare altro?");
-        }
-
-        Locale locale = new Locale(Language.ITALIAN, Region.ITALY);
-        Topic topic = TopicBuilder.with(qiContext)
-                .withResource(topicToHandle.getTopic())
-                .build();
-
-        QiChatbot qiChatbot = QiChatbotBuilder.with(qiContext)
-                .withTopic(topic)
-                .withLocale(locale)
-                .build();
-
-        chat = ChatBuilder.with(qiContext)
-                .withChatbot(qiChatbot)
-                .withLocale(locale)
-                .build();
-
-        chat.addOnStartedListener(() -> {
-            Log.d(MainActivity.CONSOLE_TAG, "Discussion started");
-            if (chat != null) {
-                chat.removeAllOnStartedListeners();
-            }
-        });
-
-        Future<Void> chatFuture = chat.async().run();
-
-        qiChatbot.addOnEndedListener(endReason -> {
-            robotHelper.releaseAbilities();
-            chatFuture.requestCancellation();
-            if(!topics.empty()){
-
-                handleTopics(topics.pop());
-            }
-            else {
-                emergencyListener = NavigationFragment.this;
-                emergencyListener.onEmergencyHandled();
-                emergency = null;
-                goToLocation(MAP_FRAME, null);
-            }
-        });
-
-        chatFuture.thenConsume(valuex -> {
-            if (valuex.hasError()) {
-                Log.d(MainActivity.CONSOLE_TAG, "Discussion finished with error.", valuex.getError());
-            }
-        });
-    }*/
 }

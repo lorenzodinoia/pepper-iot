@@ -47,6 +47,7 @@ public class EmergencyAdapter implements JsonDeserializer<Emergency> {
                 break;
             case 1:
             case 2:
+            case 3:
                 int bedId = jsonObject.get(Keys.BED_ID_KEY).getAsInt();
                 String bedLabel = String.format(Locale.getDefault(), "Letto %d", bedId);
                 jsonObject.remove(Keys.BED_ID_KEY);

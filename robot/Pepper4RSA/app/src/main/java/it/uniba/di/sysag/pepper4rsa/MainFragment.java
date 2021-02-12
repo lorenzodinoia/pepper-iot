@@ -17,6 +17,8 @@ import it.uniba.di.sysag.pepper4rsa.utils.map.RobotHelper;
 
 public class MainFragment extends Fragment {
 
+    public static final String FRAGMENT_TAG = "main_fragment";
+
     private Button buttonStartLocalize;
     private Button buttonStartService;
 
@@ -87,7 +89,7 @@ public class MainFragment extends Fragment {
                 if(mainActivity.isLocalized()) {
                     Log.d(MainActivity.CONSOLE_TAG, "Start Service Button");
                     NavigationFragment navigationFragment = new NavigationFragment();
-                    mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragment, navigationFragment).addToBackStack(null).commit();
+                    mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.frame_fragment, navigationFragment).addToBackStack(NavigationFragment.FRAGMENT_TAG).commit();
                 }
                 else{
                     robotHelper.say(getString(R.string.localize_before_start_service));

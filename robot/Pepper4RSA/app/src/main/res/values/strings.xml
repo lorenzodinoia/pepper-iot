@@ -26,10 +26,12 @@
 
     <string name="goto_text">I go to…</string>
 
+    <string name="navigation_cancelled_by_human">Navigation Cancelled, please bring me to the base before relocalize</string>
+
     <string name="hello">Hello</string>
-    <string name="emergency_button_phrase">Hello, you call me, how can i help you?</string>
-    <string name="send_pepper_phrase">Hi, they sent me to you, what can I do?</string>
-    <string name="vital_sings_em_phrase">Hi, you have altered vital signs, are you feeling well? If you want, I can call a doctor</string>
+    <string name="emergency_button_phrase">You call me, how can i help you?</string>
+    <string name="send_pepper_phrase">They sent me to you, what can I do?</string>
+    <string name="vital_sings_em_phrase">You have altered vital signs, are you feeling well? If you want, I can call a doctor</string>
 
     <string name="lux_minus_say">There is poor light, do you want to turn on the light?</string>
     <string name="lux_plus_say">There is too much light, do you want to turn off the light?</string>

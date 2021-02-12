@@ -10,8 +10,6 @@ concept:(okAction) ^rand["ok, lo faccio subito" "certo" "certamente"]
 
 concept:(askForActions) ^rand["cosa posso fare per te?" "cosa posso fare?" "hai bisogno di qualcosa?"]
 
-concept:(wheather) ["oggi è una bella giornata anche se c'è un pò di vento"]
-
 concept:(whatCanYouDo) ["cosa sai fare?" "cosa puoi fare?" "che sai fare?" "che puoi fare?" "che funzioni hai?"]
 
 concept:(askForOtherActions) ^rand["che altro posso fare per te?" "cos'altro posso fare per te?" "se vuoi puoi chiedermi di fare qualcos'altro"]
@@ -19,6 +17,8 @@ concept:(askForOtherActions) ^rand["che altro posso fare per te?" "cos'altro pos
 concept:(tellAjoke) ["raccontami una barzelletta"]
 
 concept:(feelAlone) ["* mi sento solo * {fammi compagnia} *" "* mi sento sola * {fammi compagnia} *"]
+
+concept:(feelSick) ["non mi sento {molto} {tanto} bene" "mi sento male" "non sto {molto} {tanto} bene" "sto male" "mi sento poco bene" "mi gira la testa" "ho mal di *"]
 
 concept:(callDoctor) ["chiama un dottore *" "* chiamare un dottore *?" "chiama una dottoressa *" "* chiamare una dottoressa *?" "* chiama un infermiera *?" "* chiama un infermiere *?" "chiama qualcuno *" "* chiamare qualcuno *?"]
 
@@ -33,7 +33,7 @@ concept:(dinner) ["Oggi si mangia pollo con le patate. Se non è di tuo gradimen
 concept:(joke) ^rand["Il deserto del Sahara è in Africa. Su questo non ci piove." "Chiude una fabbrica di carta igienica: andava a rotoli" "Ho inventato un cappotto che va bene per tutte le stagioni; quando fa caldo basta toglierlo" "Chi sale sull’autobus col mal di testa deve pagare due biglietti. Il mal di testa è passeggero" "
 Ragazza stufa scappa di casa. Genitori morti dal freddo"]
 
-concept:(acceptance) ^rand[si]
+concept:(acceptance) [si]
 
 u:(~hello {pepper}) ~hello, ~askForActions
 
@@ -48,8 +48,8 @@ u:({pepper} ~askForDinner) ~dinner, ~askForOtherActions
 
 u:(~tellAjoke) ~joke
 
-u:(~feelAlone) "Chiamo un tuo parente", ~askForOtherActions
+u:({pepper} ~feelAlone) "Chiamo un tuo parente", ~askForOtherActions
 
 u:({pepper} ~finish) ~greetings ^endDiscuss(success)
 
-u:("* tempo *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {oggi}?") ~wheather
+u:({pepper} ~feelSick) "Va bene, chiamo subito un dottore," ~askForOtherActions

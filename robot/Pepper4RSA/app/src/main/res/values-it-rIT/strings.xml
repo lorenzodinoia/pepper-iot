@@ -26,16 +26,19 @@
     <string name="navigation_failed">Navigazione fallita</string>
 
     <string name="goto_text">Mi dirigo verso…</string>
+
+    <string name="navigation_cancelled_by_human">Navigazione cancellata, per favore portami alla base prima di rilocalizzarmi</string>
+
     <string name="hello">Ciao</string>
-    <string name="emergency_button_phrase">Ciao, mi hai chiamato, come posso aiutarti?</string>
-    <string name="send_pepper_phrase">Ciao, mi hanno mandato da te, cosa posso fare?</string>
-    <string name="vital_sings_em_phrase">Ciao, hai dei parametri vitali alterati, ti senti bene? Se vuoi posso chiamare un dottore</string>
+    <string name="emergency_button_phrase">Mi hai chiamato, come posso aiutarti?</string>
+    <string name="send_pepper_phrase">Mi hanno mandato da te, cosa posso fare?</string>
+    <string name="vital_sings_em_phrase">Hai dei parametri vitali alterati, cosa c\'è che non va, ti senti male? Se vuoi posso chiamare un dottore</string>
 
     <string name="lux_minus_say">C\'è poca luce, vuoi accendere la luce?</string>
     <string name="lux_plus_say">C\'è troppa luce, vuoi spegnere la luce?</string>
-    <string name="voc_plus_say">C\'è un p&#243; troppa aria viziata, vuoi aprire la finestra?</string>
-    <string name="degree_minus_say">Fa un p&#243; freddo, vuoi accendere il riscaldamento?</string>
-    <string name="degree_plus_say">Fa un p&#243; caldo, vuoi accendere il condizionatore?</string>
-    <string name="humidity_plus_say">&#200; un p&#243; umido qui, vuoi accendere il condizionatore?</string>
+    <string name="voc_plus_say">C\'è un po troppa aria viziata, vuoi aprire la finestra?</string>
+    <string name="degree_minus_say">Fa un po freddo, vuoi accendere il riscaldamento?</string>
+    <string name="degree_plus_say">Fa un po caldo, vuoi accendere il condizionatore?</string>
+    <string name="humidity_plus_say">E un po umido qui, vuoi accendere il condizionatore?</string>
 
 </resources>
