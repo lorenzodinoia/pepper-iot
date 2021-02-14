@@ -5,7 +5,7 @@ import { Injectable } from "@angular/core";
     providedIn: 'root'
 })
 export class Client {
-    public static readonly SERVER_URL: string = "http://193.204.187.54:5000"
+    public static readonly SERVER_URL: string = "http://localhost:5000"
     public static readonly OPTIONS = {
         headers: new HttpHeaders({
             'Content-Type':  'application/json',

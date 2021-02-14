@@ -1,6 +1,5 @@
 <div *ngIf="room">
     <a mat-list-item [routerLink]="['/room', room.id]">
-        <mat-icon mat-list-icon class="material-icons-outlined">meeting_room</mat-icon>{{room.name}}
+        <mat-icon mat-list-icon class="material-icons-outlined">meeting_room</mat-icon>{{room.name}}<span class="dot" [style.backgroundColor]="emergency ? 'red' : 'limegreen'" style="margin-left: 5px;"></span>
     </a>
-    <bed-nav-item *ngFor="let bed of room.beds" [bed]="bed"></bed-nav-item>
 </div>

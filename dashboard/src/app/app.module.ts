@@ -4,7 +4,6 @@ import { NgxEchartsModule } from 'ngx-echarts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ToolbarComponent } from './toolbar/toolbar.component';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { RoomCardComponent } from './room-card/room-card.component';
@@ -21,7 +20,6 @@ import { InmateOxygenationChartComponent } from './inmate-oxygenation-chart/inma
 import { InmateBpmChartComponent } from './inmate-bpm-chart/inmate-bpm-chart.component';
 import { InmatePressureChartComponent } from './inmate-pressure-chart/inmate-pressure-chart.component';
 import { DatePipe } from '@angular/common';
-import { SidebarComponent } from './sidebar/sidebar.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatListModule } from '@angular/material/list';
@@ -37,7 +35,6 @@ import { BedNavItemComponent } from './bed-nav-item/bed-nav-item.component'
 @NgModule({
   declarations: [
     AppComponent,
-    ToolbarComponent,
     HomeComponent,
     RoomCardComponent,
     BedCardComponent,
@@ -52,7 +49,6 @@ import { BedNavItemComponent } from './bed-nav-item/bed-nav-item.component'
     InmateOxygenationChartComponent,
     InmateBpmChartComponent,
     InmatePressureChartComponent,
-    SidebarComponent,
     NavigationComponent,
     RoomNavItemComponent,
     BedNavItemComponent
