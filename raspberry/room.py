@@ -22,4 +22,4 @@ while True:
         data = response.json()
         print(data)
     
-    time.sleep(60)
+    time.sleep(300)
