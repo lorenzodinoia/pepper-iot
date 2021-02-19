@@ -1,5 +1,5 @@
 # Pepper IoT
-This project is developed using [Python 3.9](https://www.python.org/downloads), [MySQL 8](https://www.mysql.com/downloads/) and [Choregraphe Suite](https://developer.softbankrobotics.com/pepper-2-5/downloads/pepper-naoqi-25-downloads-windows)
+This project is developed using [Python 3.9](https://www.python.org/downloads), [MySQL 8](https://www.mysql.com/downloads/) and [Pepper SDK](https://qisdk.softbankrobotics.com/sdk/doc/pepper-sdk/index.html)
 
 Upgrade pip via `python -m pip install --upgrade pip`
 
@@ -48,11 +48,11 @@ pip install requests
 ```
 
 ### Setup
-Choose server IP address and assigned room launching [setup](raspberry/setup.py). It creates a JSON file named settings.cfg with the configuration. If this file already exists you can skip this step: it means that the Raspberry is already configured. If you want to change the configuration you may launch [setup](raspberry/setup.py) again
+Choose server IP address and assigned room launching [setup_room](raspberry/setup_room.py), assigned bed launching [setup_bed](raspberry/setup_room.py). It creates a JSON file with the configuration. If this file already exists you can skip this step: it means that the Raspberry is already configured. If you want to change the configuration you may repeat the configurations steps
 
 ### Run
 1. Launch server application
-2. Launch [sensor_manager](raspberry/sensor_manager.py)
+2. Launch [bed](raspberry/bed.py) and/or [room](raspberry/room.py)
 
 ## Dashbaord
 First install [Node.js](https://nodejs.org/dist/v14.15.4/node-v14.15.4-x64.msi), then install Angular globally
