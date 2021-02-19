@@ -83,10 +83,10 @@ def choose_bed(server_host : str, room_id : int):
 
 #Running code
 if settings_exits():
-    saved_server_host, saved_room_id, saved_room_name = load_settings()
+    saved_server_host, saved_room_id, saved_room_name, bed_id = load_settings()
     print("*CURRENT SETTINGS*")
     print("Server IP address: " + saved_server_host)
-    print("Room: %d - %s" % (saved_room_id, saved_room_name))
+    print("Room: %d - %s : Bed %d" % (saved_room_id, saved_room_name, bed_id))
     change = input("Would you like to change it? [y/n]: ").lower()[0]
     print("\n")
     if change == 'y':
